@@ -2,21 +2,25 @@
 
 'Setting position of the nodes and enable sockets'
 
+import sys
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
 
-def topology():
+def topology(args):
 
     net = Mininet_wifi()
 
     info("*** Creating nodes\n")
     net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
                    position='30,60,0')
-    ap1 = net.addAccessPoint('ap1',ssid='new-ssid',mode='g',position='50,50,0')
+    ap1 = net.addAccessPoint('ap1',ssid='new-ssid',mode='g',position='200,200,0')
     net.setPropagationModel(model="logDistance", exp=4.5)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
+
+    if '-p' not in args:
+        net.plotGraph(max_x=1000, max_y=1000)
 
     info("*** Creating Links\n")
 
@@ -39,4 +43,4 @@ def topology():
 
 if __name__== '__main__':
     setLogLevel('info')
-    topology()
+    topology(sys.argv)
