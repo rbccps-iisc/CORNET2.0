@@ -13,9 +13,9 @@ def topology(args):
 
     info("*** Creating nodes\n")
     net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
-                   position='30,60,0')
-    ap1 = net.addAccessPoint('ap1',ssid='new-ssid',mode='g',position='200,200,0')
-    net.setPropagationModel(model="logDistance", exp=4.5)
+                   position='200,400,0')
+    ap1 = net.addAccessPoint('ap1',ssid='new-ssid',mode='g',position='400,400,0')
+    net.setPropagationModel(model="logDistance", exp=3)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
