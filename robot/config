@@ -1,0 +1,5 @@
+{
+  "Stations": { "r1":"mybot"},
+  "APs": { "ap1":"lip"},
+  "string": "config file for mininet"
+}

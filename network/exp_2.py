@@ -32,8 +32,8 @@ def myNetwork():
     info('*** Add hosts/stations\n')
     sta1 = net.addStation('sta1', ip='10.0.0.1', antennaHeight='1', antennaGain='5')#,
                            #position='400,400,0')
-    sta3 = net.addStation('sta3', ip='10.0.0.3',
-                           position='600.0,200.0,0')
+    #sta3 = net.addStation('sta3', ip='10.0.0.3',
+                           #position='600.0,200.0,0')
     h1 = net.addHost('h1', cls=Host, ip='10.0.0.2', defaultRoute=None)
 
     info("*** Configuring Propagation Model\n")
@@ -56,7 +56,7 @@ def myNetwork():
 
     p1 = {'position': '250.0,400.0,0.0'}
     p2 = {'position': '950.0,400.0,0.0'}
-    p2 = {'position': '600.0,400.0,0.0'}
+    #p2 = {'position': '600.0,400.0,0.0'}
 
     net.mobility(sta1, 'start', time=1, **p1)
     net.mobility(sta1, 'stop', time=100, **p2)
