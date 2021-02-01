@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-'Setting position of the nodes and enable sockets'
+"""Setting position of the nodes and enable sockets"""
 
 import sys
 from mininet.log import setLogLevel, info
