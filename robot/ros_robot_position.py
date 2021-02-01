@@ -30,18 +30,18 @@ def callback(msg):
     # instances = len(msg.name)
     x = 0
     y = 0
-    print (msg.pose[2].position)
+    #print (msg.pose[2].position)
     for idx, val in enumerate(msg.name):
         if val == "mybot":
             # print(msg.pose[idx].position)
             x = msg.pose[idx].position.x
             y = msg.pose[idx].position.y
             print (x,y)
-    print(x,y,"asd")
+    #print(x,y,"asd")
 
     msg = 'set.sta1.setPosition(' + str(int(x)) + "," + str(int(y)) + ",0)"
     print msg
-    result = client(msg)
+    #result = client(msg)
     #print client("get.sta1.position")
 
 
