@@ -9,8 +9,8 @@ import unicodedata
 
 def getpoint(h, k, r):
     theta = random() * 2 * pi
-    return h + cos(theta) * r, k + sin(theta) * r
-
+    #return h + cos(theta) * r, k + sin(theta) * r
+    return (50,50)
 
 def client(msg):
     host = '127.0.0.1'

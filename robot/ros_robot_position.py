@@ -47,5 +47,8 @@ if __name__ == '__main__':
         x = resp.pose.position.x
         y = resp.pose.position.y
         msg = 'set.sta1.setPosition(' + str(int(x)) + "," + str(int(y)) + ",0)"
-        result = client(msg)
+        with open("/tmp/robopos", 'a') as file1:
+            file1.write(msg)
+            file1.write("\n")
+            #result = client(msg)
         rospy.sleep(1)
