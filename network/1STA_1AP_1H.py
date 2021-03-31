@@ -23,7 +23,7 @@ def topology(args):
                            controller=Controller,
                            protocol='tcp',
                            port=6633)
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', position='400,400,0')
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', position='400,-400,20')
     net.setPropagationModel(model="logDistance", exp=3)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -32,7 +32,7 @@ def topology(args):
     net.addLink(ap1, h1)
 
     if '-p' not in args:
-        net.plotGraph(max_x=1000, max_y=1000)
+        net.plotGraph(max_x=1000, max_y=1000, max_z=1000)
 
     info("*** Starting Network\n")
     net.addNAT(linkTo='ap1').configDefault()

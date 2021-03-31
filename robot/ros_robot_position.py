@@ -32,8 +32,8 @@ def ros_position_update():
     rospy.wait_for_service('/gazebo/get_model_state')
     try:
         gms = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        resp = gms(model_name, relative_entity_name)
-        return resp
+        return gms(model_name, relative_entity_name)
+
     except rospy.ServiceException, e:
         print "Service call failed: %s" % e
 
