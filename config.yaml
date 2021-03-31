@@ -1,0 +1,20 @@
+# this are the models to track
+gazebo_models:
+  - mybot
+  - lip
+
+print_debug: false
+
+pose:
+  -
+    position:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+  -
+    position:
+      x: 10.0
+      y: -1.59747503735e-19
+      z: 4.4408920985e-16
+
+

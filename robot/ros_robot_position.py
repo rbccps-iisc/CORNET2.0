@@ -1,14 +1,8 @@
 #!/usr/bin/env python
-"""update postion from ros robot to network simulator(mininet)"""
+"""update position from ros robot to network simulator(mininet)"""
 
 import rospy
-import math
-from std_msgs.msg import Float64
 from gazebo_msgs.srv import GetModelState
-# from gazebo_msgs.msg import ModelStates
-
-import unicodedata
-import sys
 import socket
 
 
@@ -32,8 +26,7 @@ def ros_position_update():
     rospy.wait_for_service('/gazebo/get_model_state')
     try:
         gms = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
-        resp = gms(model_name, relative_entity_name)
-        return resp
+        return gms(model_name, relative_entity_name)
     except rospy.ServiceException, e:
         print "Service call failed: %s" % e
 
@@ -47,5 +40,5 @@ if __name__ == '__main__':
         x = resp.pose.position.x
         y = resp.pose.position.y
         msg = 'set.sta1.setPosition(' + str(int(x)) + "," + str(int(y)) + ",0)"
-        result = client(msg)
+        client(msg)
         rospy.sleep(1)
