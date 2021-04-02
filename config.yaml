@@ -14,3 +14,6 @@ print_debug: false
 type:
 - MOBILE
 - STATIC
+ip_list:
+    - 10.0.0.1
+    - 10.0.0.2
