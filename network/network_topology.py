@@ -6,72 +6,80 @@ import sys
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
-from mn_wifi.topo import MN_TOPO
 from mininet.link import Intf
-from mininet.node import Controller, RemoteController, OVSController
+from mininet.node import Node, Controller, RemoteController, OVSController
 from mininet.node import OVSKernelSwitch, UserSwitch
 import yaml
 
 
-class NetworkTopology(MN_TOPO):
-    def __init__(self, config_file):
+def NetworkTopology(config_file):
+    "Create a network."
+    net = Mininet_wifi()
+    with open(config_file) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
 
-        with open(config_file) as f:
-            self.config = yaml.load(f, Loader=yaml.FullLoader)
+    models = config['gazebo_models']
+    node_type = config['type']
+    pose = config['pose']
+    ip_list = config['ip_list']
 
-        self.models = self.config['gazebo_models']
-        self.type = self.config['type']
-        self.pose = self.config['pose']
-        self.ip_list = self.config['ip_list']
+    c1 = net.addController(name='c1',
+                           controller=Controller,
+                           protocol='tcp',
+                           port=6633)
 
-    def build(self):
-        info("*** Creating nodes\n")
-        for idx, node in enumerate(self.models):
-            # print self.type[idx], self.pose[idx]['position']['x'], node
-            position = str(self.pose[idx]['position']['x']) + "," + str(self.pose[idx]['position']['y']) + "," + str(
-                self.pose[idx]['position']['z'])
-            print position
+    for idx, node in enumerate(models):
+        # print self.type[idx], self.pose[idx]['position']['x'], node
+        position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
+            pose[idx]['position']['z'])
+        print position
 
-            if self.type[idx] == "STATIC":
-                self.addHost(node, ip=self.ip_list[idx])
+        if node_type[idx] == "STATIC":
+            net.addHost(node, ip=ip_list[idx])
 
-                ap1 = self.addAccessPoint('ap1', ssid='new-ssid', position=position)
-                self.addLink(ap1, node)
-            elif self.type[idx] == "MOBILE":
-                self.addStation(node, ip=self.ip_list[idx], position=position)
+            ap1 = net.addAccessPoint('ap1', ssid='new-ssid', position=position)
+            info("*** Creating links\n")
+            net.addLink(ap1, node)
+        elif node_type[idx] == "MOBILE":
+            net.addStation(node, ip=ip_list[idx], position=position)
+
+    net.setPropagationModel(model="logDistance", exp=3)
+    info("*** Configuring wifi nodes\n")
+    net.configureWifiNodes()
+
+    nodes = net.stations
+    #net.telemetry(nodes=nodes, single=True, data_type='rssi')
+    net.telemetry(nodes=nodes, single=True, data_type='position')
+
+
+
+    #if '-p' not in args:
+    #net.plotGraph(max_x=10, max_y=10)#, max_z=1000)
+
+    info("*** Starting Network\n")
+    net.addNAT(linkTo='ap1').configDefault()
+    net.build()
+    c1.start()
+    ap1.start([c1])
+
+    info("*** Staring Socket Server\n")
+
+    net.socketServer(ip='127.0.0.1', port=12345)
+
+    info("*** Running CLI\n")
+    CLI(net)
+
+    info("*** Stopping network\n")
+    net.stop()
 
 
 def main(args):
     if len(args) != 2:
         print("usage: network_coordinator.py <config_file>")
     else:
-        net = Mininet_wifi(topo=NetworkTopology(args[1]))
-        net.setPropagationModel(model="logDistance", exp=3)
-        info("*** Configuring wifi nodes\n")
-        net.configureWifiNodes()
-        c1 = net.addController(name='c1',
-                               controller=Controller,
-                               protocol='tcp',
-                               port=6633)
-        if '-p' not in args:
-            net.plotGraph(max_x=1000, max_y=1000, max_z=1000)
-
-        info("*** Starting Network\n")
-        net.addNAT(linkTo='ap1').configDefault()
-        net.build()
-        c1.start()
-        ap1.start([c1])
-
-        info("*** Staring Socket Server\n")
-
-        net.socketServer(ip='127.0.0.1', port=12345)
-
-        info("*** Running CLI\n")
-        CLI(net)
-
-        info("*** Stopping network\n")
-        net.stop()
+        NetworkTopology(args[1])
 
 
 if __name__ == '__main__':
+    setLogLevel('info')
     sys.exit(main(sys.argv))
