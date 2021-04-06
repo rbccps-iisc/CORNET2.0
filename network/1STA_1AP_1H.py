@@ -6,9 +6,8 @@ import sys
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
-from mininet.link import Intf
-from mininet.node import Controller, RemoteController, OVSController
-from mininet.node import OVSKernelSwitch, UserSwitch
+
+import os
 
 
 def topology(args):
@@ -19,11 +18,8 @@ def topology(args):
                    position='0,0,0')
 
     h1 = net.addHost('h1', ip='10.0.0.2/8')
-    c1 = net.addController(name='c1',
-                           controller=Controller,
-                           protocol='tcp',
-                           port=6633)
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', position='400,-400,20')
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
+                             failMode="standalone", position='10,10,0')
     net.setPropagationModel(model="logDistance", exp=3)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -32,13 +28,12 @@ def topology(args):
     net.addLink(ap1, h1)
 
     if '-p' not in args:
-        net.plotGraph(max_x=1000, max_y=1000, max_z=1000)
+        net.plotGraph(max_x=1000, max_y=1000)
 
     info("*** Starting Network\n")
     net.addNAT(linkTo='ap1').configDefault()
     net.build()
-    c1.start()
-    ap1.start([c1])
+    ap1.start([])
 
     info("*** Staring Socket Server\n")
 
@@ -52,5 +47,6 @@ def topology(args):
 
 
 if __name__ == '__main__':
+    os.system('sudo service network-manager stop')
     setLogLevel('info')
     topology(sys.argv)
