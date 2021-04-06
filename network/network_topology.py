@@ -37,7 +37,7 @@ def NetworkTopology(config_file):
         if node_type[idx] == "STATIC":
             net.addHost(node, ip=ip_list[idx])
 
-            ap1 = net.addAccessPoint('ap1', ssid='new-ssid', position=position)
+            ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', position=position)
             info("*** Creating links\n")
             net.addLink(ap1, node)
         elif node_type[idx] == "MOBILE":
@@ -47,17 +47,17 @@ def NetworkTopology(config_file):
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
-    nodes = net.stations
+    #nodes = net.stations
     #net.telemetry(nodes=nodes, single=True, data_type='rssi')
-    net.telemetry(nodes=nodes, single=True, data_type='position')
+    #net.telemetry(nodes=nodes, single=True, data_type='position')
 
 
 
     #if '-p' not in args:
-    #net.plotGraph(max_x=10, max_y=10)#, max_z=1000)
+    net.plotGraph(max_x=10, max_y=10)#, max_z=1000)
 
     info("*** Starting Network\n")
-    net.addNAT(linkTo='ap1').configDefault()
+    #net.addNAT(linkTo='ap1').configDefault()
     net.build()
     c1.start()
     ap1.start([c1])
