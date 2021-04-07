@@ -1,44 +1,43 @@
 #!/usr/bin/python
 
-"""Setting position of the nodes and enable sockets"""
+'Setting position of the nodes and enable sockets'
 
-import sys
 from mininet.log import setLogLevel, info
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
-
 import os
 
 
-def topology(args):
+def topology():
+
     net = Mininet_wifi()
 
     info("*** Creating nodes\n")
     net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
-                   position='0,0,0')
-
-    h1 = net.addStation('h1', ip='10.0.0.2/8',position='5,0,0')
+                   position='30,60,0')
+    net.addStation('sta2', mac='00:00:00:00:00:03', ip='10.0.0.2/8',
+                   position='70,30,0')
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
-                             failMode="standalone", position='10,0,0')
-    net.setPropagationModel(model="logDistance", exp=6)
+                             failMode="standalone", position='50,50,0')
+    h1 = net.addHost('h1',ip='0.0.0.0')#, ip='10.0.0.3/8')
+
+    net.setPropagationModel(model="logDistance", exp=4.5)
+
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
     info("*** Creating links\n")
     net.addLink(ap1, h1)
 
-    #if '-p' not in args:
-    #    net.plotGraph(max_x=100, max_y=100)
-    nodes = net.stations + net.aps
-    net.telemetry(nodes=nodes, single=True, data_type='position')
-
-    info("*** Starting Network\n")
+    info("*** Starting network\n")
     net.addNAT(linkTo='ap1').configDefault()
     net.build()
     ap1.start([])
 
-    info("*** Staring Socket Server\n")
-
+    # set_socket_ip: localhost must be replaced by ip address
+    # of the network interface of your system
+    # The same must be done with socket_client.py
+    info("*** Starting Socket Server\n")
     net.socketServer(ip='127.0.0.1', port=12345)
 
     info("*** Running CLI\n")
@@ -51,4 +50,4 @@ def topology(args):
 if __name__ == '__main__':
     os.system('sudo service network-manager stop')
     setLogLevel('info')
-    topology(sys.argv)
+    topology()

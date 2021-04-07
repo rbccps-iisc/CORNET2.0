@@ -22,7 +22,7 @@ def client(msg):
     data = s.recv(1024).decode('utf-8')
     print('Received from Server: ', data)
     s.close()
-    # return data
+    return data
 
 
 def ros_position_update():
@@ -46,6 +46,7 @@ if __name__ == '__main__':
         print resp
         x = resp.pose.position.x
         y = resp.pose.position.y
-        msg = 'set.sta1.setPosition(' + str(int(x)) + "," + str(int(y)) + ",0)"
+        msg = 'set.sta1.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
         result = client(msg)
+        print result
         rospy.sleep(1)

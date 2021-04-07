@@ -32,13 +32,17 @@ if __name__ == '__main__':
     ap1 = ap1.replace("[", " ")
     ap1 = ap1.replace("]", " ")
     print ap1
-    centre = list(ap1.split(","))
-    [x,y] = getpoint(int(float(centre[1])),int(float(centre[2])), 60)
-    msg = 'set.sta1.setPosition('
-    msg = msg + str(int(x)) + "," + str(int(y)) + ",0)"
-    print msg
-    result = client(msg)
-    print client("get.sta1.position")
+    #centre = list(ap1.split(","))
+    [x, y] = [200, 200]
+    while True:
+        x = x+5
+        y = y+5
+        #getpoint(int(float(centre[1])),int(float(centre[2])), 60)
+        msg = 'set.sta1.setPosition("'
+        msg = msg + str(int(x)) + ',' + str(int(y)) + ',0")'
+        print msg
+        result = client(msg)
+        print client("get.sta1.position")
 
 
 

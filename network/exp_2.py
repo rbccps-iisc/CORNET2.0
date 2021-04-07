@@ -8,7 +8,7 @@ from mn_wifi.cli import CLI
 from mn_wifi.link import wmediumd
 from mn_wifi.wmediumdConnector import interference
 from subprocess import call
-
+import os
 
 def myNetwork():
 
@@ -81,6 +81,7 @@ def myNetwork():
 
 
 if __name__ == '__main__':
+    os.system('sudo service network-manager stop')
     setLogLevel( 'info' )
     myNetwork()
 
