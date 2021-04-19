@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""update postion from ros robot to network simulator(mininet)"""
+"""update position from ros robot to network simulator(mininet)"""
 
 import rospy
 import math

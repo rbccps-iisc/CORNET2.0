@@ -5,6 +5,7 @@ import socket
 from math import pi, cos, sin
 from random import random
 import unicodedata
+import time
 
 
 def getpoint(h, k, r):
@@ -33,16 +34,18 @@ if __name__ == '__main__':
     ap1 = ap1.replace("]", " ")
     print ap1
     #centre = list(ap1.split(","))
-    [x, y] = [200, 200]
+    [x, y] = [0, 0]
     while True:
-        x = x+5
-        y = y+5
+        x = x+1
+        y = y+1
         #getpoint(int(float(centre[1])),int(float(centre[2])), 60)
-        msg = 'set.sta1.setPosition("'
+        msg = 'set.mybot.setPosition("'
+        #msg = 'set.sta1.setPosition("'
         msg = msg + str(int(x)) + ',' + str(int(y)) + ',0")'
         print msg
         result = client(msg)
         print client("get.sta1.position")
+        time.sleep(1)
 
 
 
