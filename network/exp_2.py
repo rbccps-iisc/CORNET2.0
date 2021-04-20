@@ -30,8 +30,8 @@ def myNetwork():
     s1 = net.addSwitch('s1', cls=OVSKernelSwitch)
 
     info('*** Add hosts/stations\n')
-    sta1 = net.addStation('sta1', ip='10.0.0.1', antennaHeight='1', antennaGain='5',
-                           position='400,400,0')
+    sta1 = net.addStation('sta1', ip='10.0.0.1', antennaHeight='1', antennaGain='5')#,
+                           #position='400,400,0')
     #sta3 = net.addStation('sta3', ip='10.0.0.3',
                            #position='600.0,200.0,0')
     h1 = net.addHost('h1', cls=Host, ip='10.0.0.2', defaultRoute=None)
@@ -46,24 +46,21 @@ def myNetwork():
     net.addLink(s1, ap1)
     net.addLink(h1, s1)
 
-    #net.plotGraph(max_x=1000, max_y=1000)
-    net.setMobilityModel(time=0, model='RandomWayPoint', max_x=500, max_y=500,
-                         min_v=0.5, max_v=0.5, seed=20)
+    net.plotGraph(max_x=1000, max_y=1000)
+    #net.setMobilityModel(time=0, model='RandomWayPoint', max_x=1000, max_y=1000,
+    #                     min_v=0.5, max_v=0.5, seed=20)
 
     net.startMobility(time=0, mob_rep=1, reverse=False)
 
     p1, p2 = dict(), dict()
 
-    #p1 = {'position': '250.0,400.0,0.0'}
-    #p2 = {'position': '950.0,400.0,0.0'}
+    p1 = {'position': '250.0,400.0,0.0'}
+    p2 = {'position': '950.0,400.0,0.0'}
     #p2 = {'position': '600.0,400.0,0.0'}
 
-    #net.mobility(sta1, 'start', time=1, **p1)
-    #net.mobility(sta1, 'stop', time=100, **p2)
-    #net.stopMobility(time=105)
-
-    nodes = net.stations  # + net.aps
-    net.telemetry(nodes=nodes, single=True, data_type='rssi')
+    net.mobility(sta1, 'start', time=1, **p1)
+    net.mobility(sta1, 'stop', time=100, **p2)
+    net.stopMobility(time=105)
 
 
     info( '*** Starting network\n')

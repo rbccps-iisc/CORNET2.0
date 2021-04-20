@@ -1,17 +1,15 @@
 #!/usr/bin/python
 
 """Setting position of the nodes and enable sockets"""
-import subprocess
 import sys
 import time
-
-import mn_wifi.telemetry as TM
 from mininet.log import setLogLevel, info
 from mininet.link import TCLink
 from mn_wifi.cli import CLI
 from mn_wifi.net import Mininet_wifi
 from mn_wifi.topo import Topo
-from mn_wifi.node import AP
+from mn_wifi.link import wmediumd
+from mn_wifi.wmediumdConnector import interference
 import yaml
 import os
 start = time.time()
@@ -30,25 +28,29 @@ class Topology_MN(Topo):
         pose = config['pose']
         ip_list = config['ip_list']
 
-        hosts = []
+        #hosts = []
         aps = []
-        stations = []
+        robots = []
 
         for idx, node in enumerate(models):
             # print self.type[idx], self.pose[idx]['position']['x'], node
             position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
                 pose[idx]['position']['z'])
             print position
-
+            print idx, node
             if node_type[idx] == "STATIC":
-                hosts[idx] = self.addHost(node, ip=ip_list[idx])#, position=position)
+                robots.append(self.addHost(node, ip=ip_list[idx]))#, position=position)
 
-                aps[idx] = self.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
-                                         failMode="standalone", position=position)
+
+                aps.append(self.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
+                                         failMode="standalone", position=position))
                 info("*** Creating links\n")
-                self.addLink(hosts[idx], aps[idx], cls=TCLink)
+                self.addLink(robots[idx], aps[idx], cls=TCLink)
             elif node_type[idx] == "MOBILE":
-                stations[idx] = self.addStation(node, ip=ip_list[idx], position=position)
+                robots.append(self.addStation(node, ip=ip_list[idx], position=position))
+                aps.append(0)
+
+        print robots, aps
 
 
 def main(args):
@@ -56,14 +58,15 @@ def main(args):
         print("usage: network_coordinator.py <config_file>")
     else:
 
-        net = Mininet_wifi(topo=Topology_MN(args[1]))
-        net.setPropagationModel(model="logDistance", exp=4.5)
+        net = Mininet_wifi(topo=Topology_MN(args[1]),link=wmediumd,
+                       wmediumd_mode=interference)
+        net.setPropagationModel(model="logDistance", exp=4)
         info("*** Configuring wifi nodes\n")
         net.configureWifiNodes()
-        #if '-p' not in args:
-        #    net.plotGraph(max_x=1000, max_y=1000)
+        if '-p' not in args:
+            net.plotGraph(max_x=1000, max_y=1000)
         nodes = net.stations  # + net.aps
-        net.telemetry(nodes=nodes, single=True, data_type='rssi')
+        #net.telemetry(nodes=nodes, single=True, data_type='rssi')
 
         info("*** Starting Network\n")
         #net.addNAT(linkTo='ap1').configDefault()
