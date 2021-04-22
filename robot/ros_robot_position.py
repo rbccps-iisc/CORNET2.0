@@ -5,7 +5,6 @@ import rospy
 import math
 from std_msgs.msg import Float64
 from gazebo_msgs.srv import GetModelState
-# from gazebo_msgs.msg import ModelStates
 
 import unicodedata
 import sys

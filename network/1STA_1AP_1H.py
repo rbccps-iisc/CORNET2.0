@@ -114,8 +114,8 @@ def topology(args):
     h1 = net.addHost('h1', ip='10.0.0.2/8')#, position='5,0,0')
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
                              failMode="standalone", position='10,0,0')
-    #net.setPropagationModel(model="logDistance",sL = 2, exp=4)
-    net.setPropagationModel(model="logNormalShadowing", sL=2, exp=4, variance=2)
+    net.setPropagationModel(model="logDistance",sL = 2, exp=4)
+    #net.setPropagationModel(model="logNormalShadowing", sL=2, exp=3, variance=2)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
@@ -124,8 +124,8 @@ def topology(args):
 
     # if '-p' not in args:
     #    net.plotGraph(max_x=100, max_y=100)
-    nodes = net.stations  # + net.aps
-    net.telemetry(nodes=nodes, single=True, data_type='rssi')
+    nodes = net.stations  #+ net.aps
+    net.telemetry(nodes=nodes, single=True, data_type='position', max_x=1000, max_y=1000)
     #stat = Stats(nodes)
     #stat.thread_ = thread(target=stat.start)
     #stat.thread_.daemon = True

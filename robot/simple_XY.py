@@ -21,7 +21,7 @@ def client(msg):
         s.connect((host, port))
         s.send(str(msg).encode('utf-8'))
         data = s.recv(1024).decode('utf-8')
-        print('Reciever from Server: ', data)
+        print('Received from Server: ', data)
         return data
         s.close()
 
