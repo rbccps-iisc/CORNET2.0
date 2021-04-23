@@ -1,19 +1,26 @@
+broadcast_address: '4294967295'
+do_driver_transfer: false
+driver_sync_time: 0.01
 gazebo_models:
-- mybot
-- lip
-pose:
-- position:
-    x: 0
-    y: 0
-    z: 0
-- position:
-    x: 9
-    y: 0
-    z: 0
-print_debug: false
-type:
-- MOBILE
-- STATIC
+- agent1
+- agent2
 ip_list:
-    - 10.0.0.2/8
-    - 10.0.0.3/8
+- 192.168.0.1
+- 192.168.0.2
+mac_list:
+- 1a
+- 2a
+net_driver_uds_server_address: /tmp/net_driver_socket
+net_use_uds: true
+netsim_ip_ranging_port: 10005
+netsim_ip_server_address: localhost
+netsim_ip_server_port: 10000
+netsim_uds_server_address: /tmp/net_server_socket
+packet_holding_duration: 50
+phy_driver_uds_server_address: /tmp/phy_driver_socket
+phy_ip_server_address: localhost
+phy_ip_server_port: 10001
+phy_uds_server_address: /tmp/phy_server_socket
+phy_use_uds: true
+print_debug: false
+responsiveness_timeout: 2

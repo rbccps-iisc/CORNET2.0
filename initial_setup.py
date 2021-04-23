@@ -31,14 +31,16 @@ class CornetConfig:
 
     def generate_config(self):
         models = self.config['gazebo_models']
-        for idx, model_name in enumerate(models):
-            p = self.get_robot_info(model_name)
-            self.pose.append(p)
+        #for idx, model_name in enumerate(models):
+        #    p = self.get_robot_info(model_name)
+        #    self.pose.append(p)
 
-        self.config['pose'] = self.pose
+        #self.config['pose'] = self.pose
         print(self.gen_config)
         for item in self.gen_config:
             print(item)
+        for val in self.config['ip_list']:
+            print type(val)
 
 
 
