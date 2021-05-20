@@ -21,12 +21,16 @@ step 4: $ sudo util/install.sh -Wlnfv
 
 ###protobuf
 
-setp 1: $ wget https://github.com/protocolbuffers/protobuf/releases/download/v3.17.0/protobuf-all-3.17.0.tar.gz
-setp 2: $ tar -xzvf protobuf-all-3.17.0.tar.gz
-setp 3: $ ./configure
-setp 4: $ make check
-setp 5: $ sudo ldconfig
-setp 6: $ protoc --version
+step 1: $ wget https://github.com/protocolbuffers/protobuf/releases/download/v3.17.0/protobuf-all-3.17.0.tar.gz
+step 2: $ tar -xzvf protobuf-all-3.17.0.tar.gz
+\
+step 3: $ ./configure
+\
+step 4: $ make check 
+\
+step 5: $ sudo ldconfig
+\
+step 6: $ protoc --version
 
 ###ROS
 

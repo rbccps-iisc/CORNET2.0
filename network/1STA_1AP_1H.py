@@ -98,6 +98,7 @@ class Stats:
                     nodes_x[node], nodes_y[node] = [], []
                     rssi = mn_wifi.telemetry.get_rssi(node, self.ifaces[node][wlan])
                     os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, rssi, self.filename.format(node)))
+            time.sleep(0.5)
 
 
 
@@ -112,25 +113,25 @@ def topology(args):
                    position='0,0,0')
 
     h1 = net.addHost('h1', ip='10.0.0.2/8')#, position='5,0,0')
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
-                             failMode="standalone", position='10,0,0')
-    net.setPropagationModel(model="logDistance",sL = 2, exp=4)
-    #net.setPropagationModel(model="logNormalShadowing", sL=2, exp=3, variance=2)
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1', position='100,100,0')
+    ap2 = net.addAccessPoint('ap2', ssid='ssid-ap2', channel='6', position='200,100,0')
+    net.setPropagationModel(model="logDistance",sL = 4, exp=4)
+    #net.setPropagationModel(model="logNormalShadowing", sL=2, exp=4, variance=2)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
     info("*** Creating links\n")
     net.addLink(ap1, h1)
 
-    # if '-p' not in args:
-    #    net.plotGraph(max_x=100, max_y=100)
+    if '-p' not in args:
+        net.plotGraph(max_x=500, max_y=500)
     nodes = net.stations  #+ net.aps
-    net.telemetry(nodes=nodes, single=True, data_type='position', max_x=1000, max_y=1000)
-    #stat = Stats(nodes)
-    #stat.thread_ = thread(target=stat.start)
-    #stat.thread_.daemon = True
-    #stat.thread_._keep_alive = True
-    #stat.thread_.start()
+    net.telemetry(nodes=nodes, single=True, max_x=1000, max_y=1000)
+    stat = Stats(nodes)
+    stat.thread_ = thread(target=stat.start)
+    stat.thread_.daemon = True
+    stat.thread_._keep_alive = True
+    stat.thread_.start()
 
     info("*** Starting Network\n")
     net.addNAT(linkTo='ap1').configDefault()

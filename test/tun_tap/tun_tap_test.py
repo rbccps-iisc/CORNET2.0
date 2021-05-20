@@ -9,6 +9,10 @@ import sys
 
 import multiprocessing as multiprocessing
 import threading
+import dpkt
+from scapy.all import *
+from scapy.layers.inet import IP
+from scapy.layers.l2 import Ether
 
 ip_list = ['10.8.0.1', '10.8.0.2']  # ,"10.8.0.3","10.8.0.4"]
 num_ips = len(ip_list)
@@ -81,11 +85,14 @@ def _read_from_tuns( i, tuns):
 
         # identify IPs and save into buffer
         try:
-            print type(data)
-            print data[0]#, data.encode('hex')
+            #print data
+            #print data[0]#, data.encode('hex')
+            packet = IP(data)
+            if packet.fields['version'] == 4:
+                print packet.show()
 
-            version = data[0]
-            print ("version ",type(version))
+            #version = data[0]
+            #print ("version ",type(version))
             #version = version >> 4
             #if version == 4:
             #   ip_src = int.from_bytes(data[12:16], byteorder="big")
