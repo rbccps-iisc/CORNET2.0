@@ -19,6 +19,15 @@ step 2: $ git clone https://github.com/intrig-unicamp/mininet-wifi
 step 3: $ cd mininet-wifi  
 step 4: $ sudo util/install.sh -Wlnfv  
 
+###protobuf
+
+setp 1: $ wget https://github.com/protocolbuffers/protobuf/releases/download/v3.17.0/protobuf-all-3.17.0.tar.gz
+setp 2: $ tar -xzvf protobuf-all-3.17.0.tar.gz
+setp 3: $ ./configure
+setp 4: $ make check
+setp 5: $ sudo ldconfig
+setp 6: $ protoc --version
+
 ###ROS
 
 TO BE CONTINUED ...
