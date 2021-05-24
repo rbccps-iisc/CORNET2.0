@@ -15,6 +15,7 @@ def client(msg):
     s.close()
     # return data
 
+
 while 1:
     with open("/tmp/robopos", 'r') as file1:
         pos = file1.readline()

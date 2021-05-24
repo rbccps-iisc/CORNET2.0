@@ -14,7 +14,7 @@ import socket
 def client(msg):
     host = '127.0.0.1'
     port = 12345
-    # while msg != 'q' and msg != 'exit':
+    #while msg != 'q' and msg != 'exit':
     s = socket.socket()
     s.connect((host, port))
     s.send(str(msg).encode('utf-8'))
