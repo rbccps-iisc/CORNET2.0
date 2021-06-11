@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """
     update position from ros robot to network simulator(mininet)
-    using Unix Domain Sockets establishes the
+    using Unix Domain Sockets establishes the datapath
 """
+import struct
 
 import rospy
 import math
@@ -10,9 +11,10 @@ from std_msgs.msg import Float64
 from gazebo_msgs.srv import GetModelState
 import yaml
 import socket
+import os
 
 
-class CORNET_MIDDLEWARE:
+class CornetRM:
     def __init__(self, config_file):
         self.gen_config = {}
 
@@ -42,7 +44,9 @@ class CORNET_MIDDLEWARE:
                 if node_type[idx] == "MOBILE":
                     gms = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
                     resp = gms(model_name, relative_entity_name)
-
+                    x = resp.pose.position.x
+                    y = resp.pose.position.y
+                    msg = 'set.'+model_name+'.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
 
 
             except rospy.ServiceException, e:

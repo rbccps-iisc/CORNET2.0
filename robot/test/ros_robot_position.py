@@ -45,7 +45,7 @@ if __name__ == '__main__':
         print resp
         x = resp.pose.position.x
         y = resp.pose.position.y
-        msg = 'set.sta1.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
+        msg = 'set.mybot.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
         result = client(msg)
         print result
         rospy.sleep(1)

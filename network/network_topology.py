@@ -62,7 +62,7 @@ def main(args):
                        wmediumd_mode=interference)
         net.setPropagationModel(model="logDistance", exp=4)
         info("*** Configuring wifi nodes\n")
-        net.configureWifiNodes()
+        #net.configureWifiNodes()
         if '-p' not in args:
             net.plotGraph(max_x=1000, max_y=1000)
         nodes = net.stations  # + net.aps

@@ -31,16 +31,11 @@ class CornetConfig:
 
     def generate_config(self):
         models = self.config['gazebo_models']
-        #for idx, model_name in enumerate(models):
-        #    p = self.get_robot_info(model_name)
-        #    self.pose.append(p)
+        for idx, model_name in enumerate(models):
+            p = self.get_robot_info(model_name)
+            self.pose.append(p)
 
-        #self.config['pose'] = self.pose
-        print(self.gen_config)
-        for item in self.gen_config:
-            print(item)
-        for val in self.config['ip_list']:
-            print type(val)
+        self.config['pose'] = self.pose
 
 
 
@@ -51,7 +46,7 @@ class CornetConfig:
 
 def main(args):
     if len(args) != 2:
-        print("usage: network_coordinator.py <config_file>")
+        print("usage: initial_setup.py <config_file>")
     else:
         conf = CornetConfig(args[1])
         conf.generate_config()
