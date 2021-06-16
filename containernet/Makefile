@@ -1,4 +1,5 @@
 MININET = mininet/*.py
+MININET_WIFI = mn_wifi/*.py
 TEST = mininet/test/*.py
 EXAMPLES = mininet/examples/*.py
 MN = bin/mn

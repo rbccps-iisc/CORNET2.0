@@ -1,33 +1,26 @@
 """
 link.py: interface and link abstractions for mininet
-
 It seems useful to bundle functionality for interfaces into a single
 class.
-
 Also it seems useful to enable the possibility of multiple flavors of
 links, including:
-
 - simple veth pairs
 - tunneled links
 - patchable links (which can be disconnected and reconnected via a patchbay)
 - link simulators (e.g. wireless)
-
 Basic division of labor:
-
   Nodes: know how to execute commands
   Intfs: know how to configure themselves
   Links: know how to connect nodes together
-
 Intf: basic interface object that can configure itself
 TCIntf: interface with bandwidth limiting and delay via tc
-
 Link: basic link class for creating veth pairs
 """
 
 from mininet.log import info, error, debug
 from mininet.util import makeIntfPair
-import mininet.node
 import re
+
 
 class Intf( object ):
 
@@ -215,9 +208,9 @@ class Intf( object ):
         # quietRun( 'ip link del ' + self.name )
         self.node.delIntf( self )
         self.link = None
-
+        from containernet.node import OVSSwitch
         # call detach if we have a OVSSwitch (just to be sure)
-        if isinstance( self.node, mininet.node.OVSSwitch ):
+        if isinstance( self.node, OVSSwitch ):
             self.node.detach(self)
 
     def status( self ):
@@ -550,7 +543,7 @@ class OVSLink( Link ):
 
     def __init__( self, node1, node2, **kwargs ):
         "See Link.__init__() for options"
-        from mininet.node import OVSSwitch
+        from containernet.node import OVSSwitch
         self.isPatchLink = False
         if ( isinstance( node1, OVSSwitch ) and
              isinstance( node2, OVSSwitch ) ):
@@ -572,18 +565,3 @@ class TCLink( Link ):
         kwargs.setdefault( 'cls1', TCIntf )
         kwargs.setdefault( 'cls2', TCIntf )
         Link.__init__( self, *args, **kwargs)
-
-
-class TCULink( TCLink ):
-    """TCLink with default settings optimized for UserSwitch
-       (txo=rxo=0/False).  Unfortunately with recent Linux kernels,
-       enabling TX and RX checksum offload on veth pairs doesn't work
-       well with UserSwitch: either it gets terrible performance or
-       TCP packets with bad checksums are generated, forwarded, and
-       *dropped* due to having bad checksums! OVS and LinuxBridge seem
-       to cope with this somehow, but it is likely to be an issue with
-       many software Ethernet bridges."""
-
-    def __init__( self, *args, **kwargs ):
-        kwargs.update( txo=False, rxo=False )
-        TCLink.__init__( self, *args, **kwargs )

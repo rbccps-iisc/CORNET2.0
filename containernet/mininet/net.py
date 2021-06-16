@@ -86,101 +86,53 @@ method may be called to shut down the network.
 
 """
 
-import os
 import re
 import select
-import signal
 import random
 import shlex
 import ipaddress
+from subprocess import Popen
 
 from time import sleep
 from itertools import chain, groupby
 from math import ceil
+from six import string_types
 
-from mininet.cli import CLI
+from mininet.net import Mininet
+from mininet.link import TCULink
 from mininet.log import info, error, debug, output, warn
-from mininet.node import ( Node, Docker, Host, OVSKernelSwitch,
-                           DefaultController, Controller, OVSSwitch, OVSBridge )
+from mininet.node import Node, Controller, OVSBridge
 from mininet.nodelib import NAT
-from mininet.link import Link, Intf
-from mininet.util import ( quietRun, fixLimits, numCores, ensureRoot,
-                           macColonHex, ipStr, ipParse, netParse, ipAdd,
+from mininet.util import ( quietRun, fixLimits, ensureRoot,
+                           macColonHex, ipStr, ipParse, ipAdd,
                            waitListening, BaseString )
-from mininet.term import cleanUpScreens, makeTerms
+from mininet.cli import CLI
+from mininet.node import Docker, OVSSwitch
+from mininet.link import TCLink
 
-from subprocess import Popen
+from mn_wifi.net import Mininet_wifi
+from mn_wifi.node import AP
+from mn_wifi.wmediumdConnector import interference
+from mn_wifi.link import wmediumd, _4address, WirelessLink, ITSLink,\
+    WifiDirectLink, adhoc, mesh, physicalMesh, PhysicalWifiDirectLink
+from mn_wifi.sixLoWPAN.link import TC6LoWPANLink
+
 
 # Mininet version: should be consistent with README and LICENSE
-VERSION = "2.3.0d5"
+VERSION = "2.3.0d6"
 CONTAINERNET_VERSION = "3.0"
 
 # If an external SAP (Service Access Point) is made, it is deployed with this prefix in the name,
 # so it can be removed at a later time
 SAP_PREFIX = 'sap.'
 
-class Mininet( object ):
+
+class Containernet( Mininet_wifi ):
     "Network emulation with hosts spawned in network namespaces."
 
-    def __init__( self, topo=None, switch=OVSKernelSwitch, host=Host,
-                  controller=DefaultController, link=Link, intf=Intf,
-                  build=True, xterms=False, cleanup=False, ipBase='10.0.0.0/8',
-                  inNamespace=False,
-                  autoSetMacs=False, autoStaticArp=False, autoPinCpus=False,
-                  listenPort=None, waitConnected=False ):
-        """Create Mininet object.
-           topo: Topo (topology) object or None
-           switch: default Switch class
-           host: default Host class/constructor
-           controller: default Controller class/constructor
-           link: default Link class/constructor
-           intf: default Intf class/constructor
-           ipBase: base IP address for hosts,
-           build: build now from topo?
-           xterms: if build now, spawn xterms?
-           cleanup: if build now, cleanup before creating?
-           inNamespace: spawn switches and controller in net namespaces?
-           autoSetMacs: set MAC addrs automatically like IP addresses?
-           autoStaticArp: set all-pairs static MAC addrs?
-           autoPinCpus: pin hosts to (real) cores (requires CPULimitedHost)?
-           listenPort: base listening port to open; will be incremented for
-               each additional switch in the net if inNamespace=False"""
-        self.topo = topo
-        self.switch = switch
-        self.host = host
-        self.controller = controller
-        self.link = link
-        self.intf = intf
-        self.ipBase = ipBase
-        self.ipBaseNum, self.prefixLen = netParse( self.ipBase )
-        hostIP = ( 0xffffffff >> self.prefixLen ) & self.ipBaseNum
-        # Start for address allocation
-        self.nextIP = hostIP if hostIP > 0 else 1
-        self.inNamespace = inNamespace
-        self.xterms = xterms
-        self.cleanup = cleanup
-        self.autoSetMacs = autoSetMacs
-        self.autoStaticArp = autoStaticArp
-        self.autoPinCpus = autoPinCpus
-        self.numCores = numCores()
-        self.nextCore = 0  # next core for pinning hosts to CPUs
-        self.listenPort = listenPort
-        self.waitConn = waitConnected
-
-        self.hosts = []
-        self.switches = []
-        self.controllers = []
-        self.links = []
-
-        self.nameToNode = {}  # name to Node (Host/Switch) objects
-
-        self.terms = []  # list of spawned xterm processes
-
-        Mininet.init()  # Initialize Mininet if necessary
-
-        self.built = False
-        if topo and build:
-            self.build()
+    def __init__( self, **kwargs ):
+        self.SAPswitches = {}
+        Mininet_wifi.__init__(self, **kwargs)
 
     def waitConnected( self, timeout=None, delay=.5 ):
         """wait for each switch to connect to a controller,
@@ -219,31 +171,6 @@ class Mininet( object ):
         self.nextIP += 1
         return ip
 
-    def addHost( self, name, cls=None, **params ):
-        """Add host.
-           name: name of host to add
-           cls: custom host class/constructor (optional)
-           params: parameters for host
-           returns: added host"""
-        # Default IP and MAC addresses
-        defaults = { 'ip': ipAdd( self.nextIP,
-                                  ipBaseNum=self.ipBaseNum,
-                                  prefixLen=self.prefixLen ) +
-                                  '/%s' % self.prefixLen }
-        if self.autoSetMacs:
-            defaults[ 'mac' ] = macColonHex( self.nextIP )
-        if self.autoPinCpus:
-            defaults[ 'cores' ] = self.nextCore
-            self.nextCore = ( self.nextCore + 1 ) % self.numCores
-        self.nextIP += 1
-        defaults.update( params )
-        if not cls:
-            cls = self.host
-        h = cls( name, **defaults )
-        self.hosts.append( h )
-        self.nameToNode[ name ] = h
-        return h
-
     def removeHost( self, name, **params):
         """
         Remove a host from the network at runtime.
@@ -251,16 +178,18 @@ class Mininet( object ):
         if not isinstance( name, BaseString ) and name is not None:
             name = name.name  # if we get a host object
         try:
-            h = self.get(name)
+            n = self.get(name)
         except:
             error("Host: %s not found. Cannot remove it.\n" % name)
             return False
-        if h is not None:
-            if h in self.hosts:
-                self.hosts.remove(h)
+        if n is not None:
+            if n in self.hosts:
+                self.hosts.remove(n)
+            if n in self.stations:
+                self.stations.remove(n)
             if name in self.nameToNode:
                 del self.nameToNode[name]
-            h.stop( deleteIntfs=True )
+            n.stop( deleteIntfs=True )
             debug("Removed: %s\n" % name)
             return True
         return False
@@ -271,9 +200,11 @@ class Mininet( object ):
            nodes: optional list to delete from (e.g. self.hosts)"""
         if nodes is None:
             nodes = ( self.hosts if node in self.hosts else
-                      ( self.switches if node in self.switches else
-                        ( self.controllers if node in self.controllers else
-                          [] ) ) )
+                      (self.stations if node in self.stations else
+                       (self.aps if node in self.aps else
+                        ( self.switches if node in self.switches else
+                         ( self.controllers if node in self.controllers else
+                              [] ) ) ) ) )
         node.stop( deleteIntfs=True )
         node.terminate()
         nodes.remove( node )
@@ -283,54 +214,9 @@ class Mininet( object ):
         "Delete a host"
         self.delNode( host, nodes=self.hosts )
 
-    def addSwitch( self, name, cls=None, **params ):
-        """Add switch.
-           name: name of switch to add
-           cls: custom switch class/constructor (optional)
-           returns: added switch
-           side effect: increments listenPort ivar ."""
-        defaults = { 'listenPort': self.listenPort,
-                     'inNamespace': self.inNamespace }
-        defaults.update( params )
-        if not cls:
-            cls = self.switch
-        sw = cls( name, **defaults )
-        if not self.inNamespace and self.listenPort:
-            self.listenPort += 1
-        self.switches.append( sw )
-        self.nameToNode[ name ] = sw
-        return sw
-
     def delSwitch( self, switch ):
         "Delete a switch"
         self.delNode( switch, nodes=self.switches )
-
-    def addController( self, name='c0', controller=None, **params ):
-        """Add controller.
-           controller: Controller class"""
-        # Get controller class
-        if not controller:
-            controller = self.controller
-        # Construct new controller if one is not given
-        if isinstance( name, Controller ):
-            controller_new = name
-            # Pylint thinks controller is a str()
-            # pylint: disable=maybe-no-member
-            name = controller_new.name
-            # pylint: enable=maybe-no-member
-        else:
-            controller_new = controller( name, **params )
-        # Add new controller to net
-        if controller_new:  # allow controller-less setups
-            self.controllers.append( controller_new )
-            self.nameToNode[ name ] = controller_new
-        return controller_new
-
-    def delController( self, controller ):
-        """Delete a controller
-           Warning - does not reconfigure switches, so they
-           may still attempt to connect to it!"""
-        self.delNode( controller )
 
     def addNAT( self, name='nat0', connect=True, inNamespace=False,
                 **params):
@@ -379,13 +265,13 @@ class Mininet( object ):
 
     def __iter__( self ):
         "return iterator over node names"
-        for node in chain( self.hosts, self.switches, self.controllers ):
+        for node in chain( self.hosts, self.stations, self.aps, self.switches, self.controllers ):
             yield node.name
 
     def __len__( self ):
         "returns number of nodes in net"
-        return ( len( self.hosts ) + len( self.switches ) +
-                 len( self.controllers ) )
+        return ( len( self.hosts ) + len( self.stations ) + len( self.switches ) +
+                 len( self.aps ) + len( self.controllers ) )
 
     def __contains__( self, item ):
         "returns True if net contains named node"
@@ -409,8 +295,8 @@ class Mininet( object ):
         return macColonHex( random.randint(1, 2**48 - 1) & 0xfeffffffffff |
                             0x020000000000 )
 
-    def addLink( self, node1, node2, port1=None, port2=None,
-                 cls=None, **params ):
+    def addLink(self, node1, node2=None, port1=None, port2=None,
+                cls=None, **params):
         """"Add a link from node1 to node2
             node1: source node (or name)
             node2: dest node (or name)
@@ -419,32 +305,75 @@ class Mininet( object ):
             cls: link class (optional)
             params: additional link params (optional)
             returns: link object"""
+
         # Accept node objects or names
-        node1 = node1 if not isinstance( node1, BaseString ) else self[ node1 ]
-        node2 = node2 if not isinstance( node2, BaseString ) else self[ node2 ]
-        options = dict( params )
-        # Port is optional
-        if port1 is not None:
-            options.setdefault( 'port1', port1 )
-        if port2 is not None:
-            options.setdefault( 'port2', port2 )
-        if self.intf is not None:
-            options.setdefault( 'intf', self.intf )
-        # Set default MAC - this should probably be in Link
-        options.setdefault( 'addr1', self.randMac() )
-        options.setdefault( 'addr2', self.randMac() )
+        node1 = node1 if not isinstance(node1, string_types) else self[node1]
+        node2 = node2 if not isinstance(node2, string_types) else self[node2]
+        options = dict(params)
+
         cls = self.link if cls is None else cls
-        link = cls( node1, node2, **options )
 
-        # Allow to add links at runtime
-        # (needs attach method provided by OVSSwitch)
-        if isinstance( node1, OVSSwitch ):
-            node1.attach(link.intf1)
-        if isinstance( node2, OVSSwitch ):
-            node2.attach(link.intf2)
+        modes = [mesh, physicalMesh, adhoc, ITSLink,
+                 WifiDirectLink, PhysicalWifiDirectLink]
+        if cls in modes:
+            cls(node=node1, **params)
+        elif cls == TC6LoWPANLink:
+            link = cls(node=node1, port=port1, **params)
+            self.links.append(link)
+            return link
+        elif cls == _4address:
+            if node1 not in self.aps:
+                self.aps.append(node1)
+            elif node2 not in self.aps:
+                self.aps.append(node2)
 
-        self.links.append( link )
-        return link
+            if self.wmediumd_mode == interference:
+                link = cls(node1, node2, port1, port2)
+                self.links.append(link)
+                return link
+            else:
+                dist = node1.get_distance_to(node2)
+                if dist <= node1.params['range'][0]:
+                    link = cls(node1, node2)
+                    self.links.append(link)
+                    return link
+        elif ((node1 in self.stations and node2 in self.aps)
+              or (node2 in self.stations and node1 in self.aps)) and cls != TCLink:
+            if cls == wmediumd:
+                self.infra_wmediumd_link(node1, node2, **params)
+            else:
+                self.infra_tc(node1, node2, port1, port2, cls, **params)
+        else:
+            if 'link' in options:
+                options.pop('link', None)
+
+            # Port is optional
+            if port1 is not None:
+                options.setdefault('port1', port1)
+            if port2 is not None:
+                options.setdefault('port2', port2)
+
+            # Set default MAC - this should probably be in Link
+            options.setdefault('addr1', self.randMac())
+            options.setdefault('addr2', self.randMac())
+
+            if not cls or cls == wmediumd or cls == WirelessLink:
+                cls = TCLink
+            if self.disable_tcp_checksum:
+                cls = TCULink
+
+            cls = self.link if cls is None else cls
+            link = cls(node1, node2, **options)
+
+            # Allow to add links at runtime
+            # (needs attach method provided by OVSSwitch)
+            if isinstance(node1, OVSSwitch) or isinstance(node1, AP):
+                node1.attach(link.intf1)
+            if isinstance(node2, OVSSwitch) or isinstance(node2, AP):
+                node2.attach(link.intf2)
+
+            self.links.append(link)
+            return link
 
     def removeLink(self, link=None, node1=None, node2=None):
         """
@@ -501,24 +430,6 @@ class Mininet( object ):
             self.delLink( link )
         return links
 
-    def configHosts( self ):
-        "Configure a set of hosts."
-        for host in self.hosts:
-            info( host.name + ' ' )
-            intf = host.defaultIntf()
-            if intf:
-                host.configDefault()
-            else:
-                # Don't configure nonexistent intf
-                host.configDefault( ip=None, mac=None )
-            # You're low priority, dude!
-            # BL: do we want to do this here or not?
-            # May not make sense if we have CPU lmiting...
-            # quietRun( 'renice +18 -p ' + repr( host.pid ) )
-            # This may not be the right place to do this, but
-            # it needs to be done somewhere.
-        info( '\n' )
-
     def buildFromTopo( self, topo=None ):
         """Build mininet from a topology object
            At the end of this function, everything should be connected
@@ -572,70 +483,12 @@ class Mininet( object ):
         raise Exception( 'configureControlNetwork: '
                          'should be overriden in subclass', self )
 
-    def build( self ):
-        "Build mininet."
-        if self.topo:
-            self.buildFromTopo( self.topo )
-        if self.inNamespace:
-            self.configureControlNetwork()
-        info( '*** Configuring hosts\n' )
-        self.configHosts()
-        if self.xterms:
-            self.startTerms()
-        if self.autoStaticArp:
-            self.staticArp()
-        self.built = True
-
-    def startTerms( self ):
-        "Start a terminal for each node."
-        if 'DISPLAY' not in os.environ:
-            error( "Error starting terms: Cannot connect to display\n" )
-            return
-        info( "*** Running terms on %s\n" % os.environ[ 'DISPLAY' ] )
-        cleanUpScreens()
-        self.terms += makeTerms( self.controllers, 'controller' )
-        self.terms += makeTerms( self.switches, 'switch' )
-        self.terms += makeTerms( self.hosts, 'host' )
-
-    def stopXterms( self ):
-        "Kill each xterm."
-        for term in self.terms:
-            os.kill( term.pid, signal.SIGKILL )
-        cleanUpScreens()
-
-    def staticArp( self ):
-        "Add all-pairs ARP entries to remove the need to handle broadcast."
-        for src in self.hosts:
-            for dst in self.hosts:
-                if src != dst:
-                    src.setARP( ip=dst.IP(), mac=dst.MAC() )
-
-    def start( self ):
-        "Start controller and switches."
-        if not self.built:
-            self.build()
-        info( '*** Starting controller\n' )
-        for controller in self.controllers:
-            info( controller.name + ' ')
-            controller.start()
-        info( '\n' )
-        info( '*** Starting %s switches\n' % len( self.switches ) )
-        for switch in self.switches:
-            info( switch.name + ' ')
-            switch.start( self.controllers )
-        started = {}
-        for swclass, switches in groupby(
-                sorted( self.switches,
-                        key=lambda s: str( type( s ) ) ), type ):
-            switches = tuple( switches )
-            if hasattr( swclass, 'batchStartup' ):
-                success = swclass.batchStartup( switches )
-                started.update( { s: s for s in success } )
-        info( '\n' )
-        if self.waitConn:
-            self.waitConnected()
-
     def stop( self ):
+        self.stop_graph_params()
+        info('*** Removing NAT rules of %i SAPs\n' % len(self.SAPswitches))
+        for SAPswitch in self.SAPswitches:
+            self.removeSAPNAT(self.SAPswitches[SAPswitch])
+        info("\n")
         "Stop the controller(s), switches and hosts"
         info( '*** Stopping %i controllers\n' % len( self.controllers ) )
         for controller in self.controllers:
@@ -650,27 +503,28 @@ class Mininet( object ):
             info( '.' )
             link.stop()
         info( '\n' )
-        info( '*** Stopping %i switches\n' % len( self.switches ) )
+        nodesL2 = self.switches + self.aps
+        info( '*** Stopping %i switches\n' % len( nodesL2 ) )
         stopped = {}
         for swclass, switches in groupby(
-                sorted( self.switches,
-                        key=lambda s: str( type( s ) ) ), type ):
-            switches = tuple( switches )
-            if hasattr( swclass, 'batchShutdown' ):
-                success = swclass.batchShutdown( switches )
-                stopped.update( { s: s for s in success } )
-        for switch in self.switches:
-            info( switch.name + ' ' )
+                sorted(nodesL2, key=type), type):
+            switches = tuple(switches)
+            if hasattr(swclass, 'batchShutdown'):
+                success = swclass.batchShutdown(switches)
+                stopped.update({s: s for s in success})
+        for switch in nodesL2:
+            info(switch.name + ' ')
             if switch not in stopped:
                 switch.stop()
             switch.terminate()
         info( '\n' )
-        info( '*** Stopping %i hosts\n' % len( self.hosts ) )
-        for host in self.hosts:
-            info( host.name + ' ' )
-            host.terminate()
+        nodes = self.hosts + self.stations
+        info( '*** Stopping %i hosts/stations\n' % len( nodes ) )
+        for node in nodes:
+            info( node.name + ' ' )
+            node.terminate()
+        self.closeMininetWiFi()
         info( '\n*** Done\n' )
-
 
     def run( self, test, *args, **kwargs ):
         "Perform a complete start/test/stop cycle."
@@ -1004,9 +858,9 @@ class Mininet( object ):
         elif dst not in self.nameToNode:
             error( 'dst not in network: %s\n' % dst )
         else:
-            if isinstance( src, BaseString ):
+            if isinstance( src, basestring ):
                 src = self.nameToNode[ src ]
-            if isinstance( dst, BaseString ):
+            if isinstance( dst, basestring ):
                 dst = self.nameToNode[ dst ]
             connections = src.connectionsTo( dst )
             if len( connections ) == 0:
@@ -1037,21 +891,11 @@ class Mininet( object ):
         fixLimits()
         cls.inited = True
 
-
-class Containernet( Mininet ):
     """
     A Mininet with Docker related methods.
     Inherits Mininet.
     This class is not more than API beautification.
     """
-
-    def __init__(self, topo=None, dimage=None, **params):
-        # call original Mininet.__init__ with build=False
-        # still provide any topo objects and init node lists
-        Mininet.__init__(self, build=False, **params)
-        self.SAPswitches = dict()
-        if topo and dimage:
-            self.buildFromTopo(topo, dimage)
 
     def addDocker( self, name, cls=Docker, **params ):
         """
@@ -1066,7 +910,6 @@ class Containernet( Mininet ):
         """
         return self.removeHost(name, **params)
 
-
     def addExtSAP(self, sapName, sapIP, dpid=None, **params):
         """
         Add an external Service Access Point, implemented as an OVSBridge
@@ -1077,7 +920,7 @@ class Containernet( Mininet ):
         :return:
         """
         SAPswitch = self.addSwitch(sapName, cls=OVSBridge, prefix=SAP_PREFIX,
-                       dpid=dpid, ip=sapIP, **params)
+                                   dpid=dpid, ip=sapIP, **params)
         self.SAPswitches[sapName] = SAPswitch
 
         NAT = params.get('NAT', False)
@@ -1086,51 +929,6 @@ class Containernet( Mininet ):
 
         return SAPswitch
 
-    def buildFromTopo( self, topo=None, dimage=None ):
-        """
-        Build Containernet from a topology object. Overrides
-        buildFromTopo from Mininet class, since we need to invoke
-        addDocker here instead of addHost.
-        At the en of this function, everything should be connected
-        and up.
-        """
-
-        info( '*** Creating network\n' )
-
-        if not self.controllers and self.controller:
-            # Add a default controller
-            info( '*** Adding controller\n' )
-            classes = self.controller
-            if not isinstance( classes, list ):
-                classes = [ classes ]
-            for i, cls in enumerate( classes ):
-                # Allow Controller objects because nobody understands partial()
-                if isinstance( cls, Controller ):
-                    self.addController( cls )
-                else:
-                    self.addController( 'c%d' % i, cls )
-
-        info( '*** Adding Docker containers:\n' )
-        for hostName in topo.hosts():
-            self.addDocker( hostName, dimage=dimage, **topo.nodeInfo( hostName ) )
-            info( hostName + ' ' )
-
-        info( '\n*** Adding switches:\n' )
-        for switchName in topo.switches():
-            # A bit ugly: add batch parameter if appropriate
-            params = topo.nodeInfo( switchName )
-            cls = params.get( 'cls', self.switch )
-            self.addSwitch( switchName, **params )
-            info( switchName + ' ' )
-
-        info( '\n*** Adding links:\n' )
-        for srcName, dstName, params in topo.links(
-                sort=True, withInfo=True ):
-            self.addLink( **params )
-            info( '(%s, %s) ' % ( srcName, dstName ) )
-
-        info( '\n' )
-
     def removeExtSAP(self, sapName):
         SAPswitch = self.SAPswitches[sapName]
         info( 'stopping external SAP:' + SAPswitch.name + ' \n' )
@@ -1138,7 +936,6 @@ class Containernet( Mininet ):
         SAPswitch.terminate()
 
         self.removeSAPNAT(SAPswitch)
-
 
     def addSAPNAT(self, SAPSwitch):
         """
@@ -1167,9 +964,7 @@ class Containernet( Mininet ):
 
         info("added SAP NAT rules for: {0} - {1}\n".format(SAPSwitch.name, SAPNet))
 
-
     def removeSAPNAT(self, SAPSwitch):
-
         SAPip = SAPSwitch.ip
         SAPNet = str(ipaddress.IPv4Network(unicode(SAPip), strict=False))
         # due to a bug with python-iptables, removing and finding rules does not succeed when the mininet CLI is running
@@ -1187,16 +982,6 @@ class Containernet( Mininet ):
         p.communicate()
 
         info("remove SAP NAT rules for: {0} - {1}\n".format(SAPSwitch.name, SAPNet))
-
-
-    def stop(self):
-        super(Containernet, self).stop()
-
-        info('*** Removing NAT rules of %i SAPs\n' % len(self.SAPswitches))
-        for SAPswitch in self.SAPswitches:
-            self.removeSAPNAT(self.SAPswitches[SAPswitch])
-        info("\n")
-
 
 
 class MininetWithControlNet( Mininet ):
