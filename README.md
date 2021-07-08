@@ -10,28 +10,19 @@ CORNET 2.0 is more generic framework that can be integrated with any robotic fra
 For network realization Mininet WiFi is used; the dependent packages need to installed as mentioned in mininet wifi documentation. 
 
 ##Installation 
-###mininet-WiFi
+###mininet-WiFi + Containernet Support
 
 **We highly recommend using Ubuntu version 16.04 or higher. Some new hostapd features might not work on Ubuntu 14.04.**
 
-step 1: $ sudo apt-get install git  
-step 2: $ git clone https://github.com/intrig-unicamp/mininet-wifi  
-step 3: $ cd mininet-wifi  
-step 4: $ sudo util/install.sh -Wlnfv  
+     sudo apt-get install git
+     sudo apt-get install ansible git aptitude
+     git clone https://github.com/ramonfontes/containernet.git
+     cd containernet/ansible
+     ~/containernet/ansible$ sudo ansible-playbook -i "localhost," -c local install.yml
+     cd ..
+     ~/containernet$ sudo python setup.py install
 
-###protobuf
 
-step 1: $ wget https://github.com/protocolbuffers/protobuf/releases/download/v3.17.0/protobuf-all-3.17.0.tar.gz
-\
-step 2: $ tar -xzvf protobuf-all-3.17.0.tar.gz
-\
-step 3: $ ./configure
-\
-step 4: $ make check 
-\
-step 5: $ sudo ldconfig
-\
-step 6: $ protoc --version
 
 ###ROS
 

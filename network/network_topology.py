@@ -12,12 +12,14 @@ from mn_wifi.link import wmediumd
 from mn_wifi.wmediumdConnector import interference
 import yaml
 import os
+
 start = time.time()
+
 
 class Topology_MN(Topo):
     def __init__(self, *args, **params):
         super(Topology_MN, self).__init__(*args, **params)
-        #Topo.__init__(self, *args, **params)
+        # Topo.__init__(self, *args, **params)
 
     def build(self, config_file):
         with open(config_file) as f:
@@ -28,7 +30,7 @@ class Topology_MN(Topo):
         pose = config['pose']
         ip_list = config['ip_list']
 
-        #hosts = []
+        # hosts = []
         aps = []
         robots = []
 
@@ -39,17 +41,18 @@ class Topology_MN(Topo):
             print position
             print idx, node
             if node_type[idx] == "STATIC":
-                robots.append(self.addHost(node, ip=ip_list[idx]))#, position=position)
-
+                robots.append(self.addHost(node, ip=ip_list[idx]))  # , position=position)
 
                 aps.append(self.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
-                                         failMode="standalone", position=position))
+                                               failMode="standalone", position=position))
                 info("*** Creating links\n")
                 self.addLink(robots[idx], aps[idx], cls=TCLink)
             elif node_type[idx] == "MOBILE":
                 robots.append(self.addStation(node, ip=ip_list[idx], position=position))
                 aps.append(0)
 
+        # gazebo=self.addHost('gazebo', ip='10.0.0.252/8')
+        # self.addLink(gazebo,aps.pop())
         print robots, aps
 
 
@@ -58,29 +61,29 @@ def main(args):
         print("usage: network_coordinator.py <config_file>")
     else:
 
-        net = Mininet_wifi(topo=Topology_MN(args[1]),link=wmediumd,
-                       wmediumd_mode=interference)
+        net = Mininet_wifi(topo=Topology_MN(args[1]), link=wmediumd,
+                           wmediumd_mode=interference)
         net.setPropagationModel(model="logDistance", exp=4)
         info("*** Configuring wifi nodes\n")
-        #net.configureWifiNodes()
-        if '-p' not in args:
-            net.plotGraph(max_x=1000, max_y=1000)
-        nodes = net.stations  # + net.aps
-        #net.telemetry(nodes=nodes, single=True, data_type='rssi')
+        # net.configureWifiNodes()
+        #if '-p' not in args:
+        #    net.plotGraph(max_x=1000, max_y=1000)
+        nodes = net.stations + net.aps
+        net.telemetry(nodes=nodes, single=True, max_x=1000, max_y=1000, max_z=1000, data_type='position')
 
         info("*** Starting Network\n")
-        #net.addNAT(linkTo='ap1').configDefault()
+        # net.addNAT(linkTo='ap1').configDefault()
         net.start()
         aps = net.stations
         info("*** printing all nodes\n")
         print (aps)
         info("*** Staring Socket Server\n")
-        
+
         net.socketServer(ip='127.0.0.1', port=12345)
-        
+
         info("*** Running CLI\n")
         CLI(net)
-    
+
         info("*** Stopping network\n")
         net.stop()
 

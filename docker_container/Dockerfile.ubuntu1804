@@ -1,0 +1,15 @@
+FROM ubuntu:bionic
+MAINTAINER manuel.peuster@uni-paderborn.de
+
+RUN apt-get update && apt-get install -y \
+    net-tools \
+    iputils-ping \
+    iproute2 \
+    python3-setuptools \
+    python3-pip \
+    vim \
+    wavemon \
+    wireless-tools \
+    iw
+
+CMD /bin/bash
