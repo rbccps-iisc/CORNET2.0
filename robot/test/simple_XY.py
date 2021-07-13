@@ -42,7 +42,7 @@ if __name__ == '__main__':
             y = y + 1
         # getpoint(int(float(centre[1])),int(float(centre[2])), 60)
         #msg = 'set.mybot.setPosition("'
-        msg = 'set.sta1.setPosition("'
+        msg = 'set.mybot1.setPosition("'
         msg = msg + str(int(x)) + ',' + str(int(y)) + ',0")'
         print msg
         result = client(msg)

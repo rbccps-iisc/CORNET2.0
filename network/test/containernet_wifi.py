@@ -23,10 +23,10 @@ def topology(args):
     sta2 = net.addStation('mybot2', ip='10.0.0.4', mac='00:02:00:00:00:11',
                           cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='10,10,0')
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='6', position='5,5,0')
-    h1 = net.addDocker('h1', ip='10.0.0.2',
-                       dimage="cornet:focalfoxyNWH")
+    h1 = net.addStation('h1', ip='10.0.0.2',
+                       cls=DockerSta, dimage="cornet:focalfoxyNWH")
 
-    s1 = net.addSwitch('s1')
+
     c0 = net.addController('c0')
 
     info("*** Configuring Propagation Model\n")
@@ -36,13 +36,12 @@ def topology(args):
     net.configureWifiNodes()
 
     info("*** Creating links\n")
-    net.addLink(ap1, s1)
-    net.addLink(h1,s1)
+    net.addLink(ap1, h1)
 
-    nodes = net.stations  + net.aps
-    net.telemetry(nodes=nodes, single=True, max_x=500, max_y=500, data_type='position')
-    #if '-p' not in args:
-    #    net.plotGraph(max_x=200, max_y=200)
+    #nodes = net.stations  #+ net.aps
+    #net.telemetry(nodes=nodes, single=True, max_x=500, max_y=500, data_type='position')
+    if '-p' not in args:
+        net.plotGraph(max_x=200, max_y=200)
 
     info('*** Starting network\n')
     net.build()
