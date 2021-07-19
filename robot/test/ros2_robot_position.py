@@ -5,7 +5,6 @@ import socket
 import sys
 import time
 
-import gazebo_msgs
 import rclpy
 from gazebo_msgs.srv import GetEntityState
 from rclpy.node import Node
@@ -23,7 +22,7 @@ def client(msg):
     s.close()
     return data
 
-class Rclpy_Client(Node):
+class RclpyClient(Node):
     def __init__(self):
         super().__init__('minimal_client_async')
 
@@ -77,7 +76,7 @@ if __name__ == '__main__':
     while True:
         try:
             rclpy.init(args=sys.argv)
-            R1 = Rclpy_Client()
+            R1 = RclpyClient()
             R1.send_request('name_robo0')
             rclpy.spin_once(R1)
             if R1.response.done():
@@ -93,7 +92,7 @@ if __name__ == '__main__':
             time.sleep(1)
 
             rclpy.init(args=sys.argv)
-            R2 = Rclpy_Client()
+            R2 = RclpyClient()
             R2.send_request('name_robo1')
             rclpy.spin_once(R2)
             if R2.response.done():

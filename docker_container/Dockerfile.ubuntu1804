@@ -3,6 +3,7 @@ MAINTAINER manuel.peuster@uni-paderborn.de
 
 RUN apt-get update && apt-get install -y \
     net-tools \
+    ethtool \
     iputils-ping \
     iproute2 \
     python3-setuptools \

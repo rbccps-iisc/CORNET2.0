@@ -91,11 +91,13 @@ def topology(args):
     info("*** Creating links\n")
     net.addLink(ap1, h1)
     #net.addLink(root, ap1)
+    info('*** Configuring WiFi nodes\n')
+    net.configureWifiNodes()
 
-    if '-p' not in args:
-        net.plotGraph(max_x=500, max_y=500)
-    #nodes = net.stations  #+ net.aps
-    #net.telemetry(nodes=nodes, single=True, max_x=1000, max_y=1000)
+    #if '-p' not in args:
+    #    net.plotGraph(max_x=500, max_y=500)
+    nodes = net.stations  #+ net.aps
+    net.telemetry(nodes=nodes, single=True, max_x=1000, max_y=1000, data_type='position')
     #stat = Stats(nodes)
     #stat.thread_ = thread(target=stat.start)
     #stat.thread_.daemon = True

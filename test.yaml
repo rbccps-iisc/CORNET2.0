@@ -1,0 +1,34 @@
+gazebo_models:
+- name_robo0
+- name_robo1
+- ap_0
+
+ip_list:
+- 10.0.0.1/8
+- 10.0.0.2/8
+- 10.0.0.3/8
+
+pose:
+- position:
+    x: 2
+    y: 10
+    z: 0
+- position:
+    x: 10
+    y: 10
+    z: 0
+- position:
+    x: 1
+    y: 10
+    z: 0
+
+type:
+- MOBILE
+- MOBILE
+- STATIC
+
+image:
+- "cornet:focalfoxyNWH"
+
+
+
