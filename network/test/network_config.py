@@ -35,29 +35,28 @@ def topology(args):
         sta_list = []
         ap_list = []
         info('*** Adding docker containers\n')
-        # for idx, node in enumerate(models):
-        #     position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
-        #         pose[idx]['position']['z'])
-        #
-        #     if node_type[idx] == "STATIC":
-        #         # sta_list.append(net.addStation('host%s'%idx, ip=ip_list[idx],
-        #         #                              cls=DockerSta, dimage=string1, cpu_shares=20))
-        #         ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', channel='6', position=position))
-        #         # net.addLink(sta_list[idx], ap_list[idx], cls=TCLink)
-        #     elif node_type[idx] == "MOBILE":
-        #         sta_list.append(net.addStation(node, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
-        #                                        cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
-        info('*** Adding docker containers\n')
-        sta1 = net.addStation('name_robo0', ip='10.0.0.1/8', mac='00:02:00:00:00:10',
-                              cls=DockerSta, dimage=string1, cpu_shares=20, position='2,10,0')
-        sta2 = net.addStation('name_robo1', ip='10.0.0.2/8', mac='00:02:00:00:00:11',
-                              cls=DockerSta, dimage=string1, cpu_shares=20, position='10,10,0')
-        ap1 = net.addAccessPoint('ap_0', ssid='new-ssid', mode='g', channel='6', position='1,1,0')
+        for idx, node in enumerate(models):
+            position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
+                pose[idx]['position']['z'])
+            print(type(node), type(ip_list[idx]))
+
+            if node_type[idx] == "STATIC":
+                # sta_list.append(net.addStation('host%s'%idx, ip=ip_list[idx],
+                #                              cls=DockerSta, dimage=string1, cpu_shares=20))
+                ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', channel='6', position=position))
+                #FIXME add channel parameters as well to the config file.
+
+                # net.addLink(sta_list[idx], ap_list[idx], cls=TCLink)
+            elif node_type[idx] == "MOBILE":
+                sta_list.append(net.addStation(node, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
+                                               cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
+
 
         c0 = net.addController('c0')
 
         info("*** Configuring Propagation Model\n")
-        net.setPropagationModel(model="logDistance", exp=4)
+        net.setPropagationModel(model="logDistance", exp=4.5)
+        # FIXME add propagation model as well to the config file.
 
         info('*** Configuring WiFi nodes\n')
         net.configureWifiNodes()
@@ -80,6 +79,6 @@ def topology(args):
 
 
 if __name__ == '__main__':
-    # os.system('sudo systemctl stop network-manager')
+    os.system('sudo systemctl stop network-manager')
     setLogLevel('info')
     topology(sys.argv)

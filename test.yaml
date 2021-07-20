@@ -1,12 +1,12 @@
 gazebo_models:
-- name_robo0
-- name_robo1
+- name%_r0
+- name_r1
 - ap_0
 
 ip_list:
-- 10.0.0.1/8
-- 10.0.0.2/8
-- 10.0.0.3/8
+- 10.0.0.1
+- 10.0.0.2
+- 10.0.0.3
 
 pose:
 - position:

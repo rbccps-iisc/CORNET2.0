@@ -17,9 +17,9 @@ def topology(args):
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='1',
                              failMode="standalone", mac='00:00:00:00:00:01',
                              position='400,600,0')
-    net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
+    net.addStation('name_robo1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
                    position='400,400,0')
-    net.addStation('sta2', mac='00:00:00:00:00:03', ip='10.0.0.3/8',
+    net.addStation('name_robo2', mac='00:00:00:00:00:03', ip='10.0.0.3/8',
                    position='400,500,0')
     h1 = net.addHost('h1', ip='10.0.0.2/8')
     c1 = net.addController('c1')
@@ -49,5 +49,5 @@ def topology(args):
 
 
 if __name__ == '__main__':
-    setLogLevel('info')
+    setLogLevel('debug')
     topology(sys.argv)
