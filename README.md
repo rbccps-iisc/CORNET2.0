@@ -24,6 +24,7 @@ For network realization Mininet WiFi is used; the dependent packages need to ins
 
 
 
-###ROS
+###ROS2
+The Docker with ROS2 support is provided in docker_container folder along with other wireless tools for testing and evaulation.
 
-TO BE CONTINUED ...
+build.sh script will build and tag the images required for running. you can add you own Dockerfile based on the file Dockerfile
