@@ -15,6 +15,7 @@ import yaml
 
 
 def topology(args):
+    net = Containernet(link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
     if len(args) != 2:
         print("usage: network_config.py <config_file>")
     else:
@@ -30,28 +31,36 @@ def topology(args):
         string1 = ""
         string1 = string1.join(image)
         print(string1)
-        #print(imag)
+        # print(imag)
         sta_list = []
         ap_list = []
-        net = Containernet(link=wmediumd, wmediumd_mode=interference, noise_th=-91, fading_cof=3)
         info('*** Adding docker containers\n')
-        for idx, node in enumerate(models):
-            position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
-                pose[idx]['position']['z'])
-
-            if node_type[idx] == "STATIC":
-                #sta_list.append(net.addStation('host%s'%idx, ip=ip_list[idx],
-                #                              cls=DockerSta, dimage=string1, cpu_shares=20))
-                ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', channel='6', position=position))
-                #net.addLink(sta_list[idx], ap_list[idx], cls=TCLink)
-            elif node_type[idx] == "MOBILE":
-                sta_list.append(net.addStation(node, ip=ip_list[idx],mac='00:02:00:00:00:1%s'%idx,
-                                              cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
+        # for idx, node in enumerate(models):
+        #     position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
+        #         pose[idx]['position']['z'])
+        #
+        #     if node_type[idx] == "STATIC":
+        #         # sta_list.append(net.addStation('host%s'%idx, ip=ip_list[idx],
+        #         #                              cls=DockerSta, dimage=string1, cpu_shares=20))
+        #         ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', channel='6', position=position))
+        #         # net.addLink(sta_list[idx], ap_list[idx], cls=TCLink)
+        #     elif node_type[idx] == "MOBILE":
+        #         sta_list.append(net.addStation(node, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
+        #                                        cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
+        info('*** Adding docker containers\n')
+        sta1 = net.addStation('name_robo0', ip='10.0.0.1/8', mac='00:02:00:00:00:10',
+                              cls=DockerSta, dimage=string1, cpu_shares=20, position='2,10,0')
+        sta2 = net.addStation('name_robo1', ip='10.0.0.2/8', mac='00:02:00:00:00:11',
+                              cls=DockerSta, dimage=string1, cpu_shares=20, position='10,10,0')
+        ap1 = net.addAccessPoint('ap_0', ssid='new-ssid', mode='g', channel='6', position='1,1,0')
 
         c0 = net.addController('c0')
 
         info("*** Configuring Propagation Model\n")
         net.setPropagationModel(model="logDistance", exp=4)
+
+        info('*** Configuring WiFi nodes\n')
+        net.configureWifiNodes()
 
         if '-p' not in args:
             net.plotGraph(max_x=200, max_y=200)
@@ -71,6 +80,6 @@ def topology(args):
 
 
 if __name__ == '__main__':
-    os.system('sudo systemctl stop network-manager')
+    # os.system('sudo systemctl stop network-manager')
     setLogLevel('info')
     topology(sys.argv)
