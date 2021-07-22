@@ -7,7 +7,7 @@ CORNET 1.0 integrates Ardupilot SITL in Gazebo and NS3 and the source code is av
 
 CORNET 2.0 is more generic framework that can be integrated with any robotic framework that supports ROS. This code was tested on an Ubuntu 16.04 and Ubuntu 18.04 system.
 
-For network realization Mininet WiFi is used; the dependent packages need to installed as mentioned in mininet wifi documentation. 
+For network realization, we use Mininet Wi-Fi; the dependent packages need to installed as mentioned in mininet wifi documentation. 
 
 ##Installation 
 ###mininet-WiFi + Containernet Support
@@ -25,6 +25,6 @@ For network realization Mininet WiFi is used; the dependent packages need to ins
 
 
 ###ROS2
-The Docker with ROS2 support is provided in docker_container folder along with other wireless tools for testing and evaulation.
+The Docker with ROS2 support provided in docker_container folder along with other wireless tools for testing and evaluation.
 
 build.sh script will build and tag the images required for running. you can add you own Dockerfile based on the file Dockerfile

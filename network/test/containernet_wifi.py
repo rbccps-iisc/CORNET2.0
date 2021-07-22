@@ -29,16 +29,16 @@ def topology(args):
 
     c0 = net.addController('c0')
 
-    #info("*** Configuring Propagation Model\n")
-    #net.setPropagationModel(model="logDistance", exp=4)
+    info("*** Configuring Propagation Model\n")
+    net.setPropagationModel(model="logDistance", exp=4.5)
 
     info('*** Configuring WiFi nodes\n')
     net.configureWifiNodes()
 
     # info("*** Creating links\n")
     # net.addLink(ap1, h1)
-    #if '-p' not in args:
-    #    net.plotGraph(max_x=200, max_y=200)
+    if '-p' not in args:
+        net.plotGraph(max_x=500, max_y=500)
 
     info('*** Starting network\n')
     net.build()
@@ -62,5 +62,5 @@ def topology(args):
 
 if __name__ == '__main__':
     os.system('sudo service network-manager stop')
-    setLogLevel('debug')
+    setLogLevel('info')
     topology(sys.argv)

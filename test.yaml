@@ -1,6 +1,6 @@
 gazebo_models:
-- name%_r0
-- name_r1
+- robo0
+- robo1
 - ap_0
 
 ip_list:
