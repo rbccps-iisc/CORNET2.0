@@ -55,7 +55,8 @@ class GzClient:
 
                 logging.debug(''.join([str(item) for item in self.msg]))
                 #FIXME the update to the mininet server is pending
-
+                result = self.client(''.join([str(item) for item in self.msg]))
+                logging.debug(result)
         except Exception, e:
             print " failed: %s" % e
 

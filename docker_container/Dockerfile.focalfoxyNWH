@@ -55,6 +55,9 @@ RUN apt-get update && apt-get install -y \
     vim \
     wavemon \
     wireless-tools \
+    wireshark \
+    nmap \
+    traceroute \
     iw
 
 
