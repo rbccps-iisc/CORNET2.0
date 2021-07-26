@@ -55,11 +55,11 @@ RUN apt-get update && apt-get install -y \
     vim \
     wavemon \
     wireless-tools \
-    wireshark \
     nmap \
     traceroute \
     iw
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
 
 RUN pip3 install -U pip setuptools 
 RUN pip3 install roslibpy
