@@ -46,7 +46,7 @@ if __name__ == '__main__':
         msg = msg + str(int(x)) + ',' + str(int(y)) + ',0")'
         print msg
         result = client(msg)
-        print client("get.robo1.position")
+        print client("get.robot1.position")
         time.sleep(0.5)
         if x == 300:
             break
