@@ -21,11 +21,11 @@ def topology(args):
     info('*** Adding docker containers\n')
     robo0 = net.addStation('robo0', ip='10.0.0.1', mac='00:02:00:00:00:10',
                                 cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='2,10,0')
-    robo1 = net.addStation('robo1', ip='10.0.0.2', mac='00:02:00:00:00:11',
-                                cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='10,10,0')
+    #robo1 = net.addStation('robo1', ip='10.0.0.2', mac='00:02:00:00:00:11',
+    #                            cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='10,10,0')
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='g', channel='6', position='1,1,0')
-    # h1 = net.addHost('h1', ip='10.0.0.2/8',
-    #                dimage=image)
+    h1 = net.addDocker('h1', ip='10.0.0.4/8',
+                    dimage="cornet:focalfoxyNWH")
 
     c0 = net.addController('c0')
 
@@ -35,8 +35,8 @@ def topology(args):
     info('*** Configuring WiFi nodes\n')
     net.configureWifiNodes()
 
-    # info("*** Creating links\n")
-    # net.addLink(ap1, h1)
+    info("*** Creating links\n")
+    net.addLink(ap1, h1)
     if '-p' not in args:
         net.plotGraph(max_x=500, max_y=500)
 
@@ -62,5 +62,5 @@ def topology(args):
 
 if __name__ == '__main__':
     os.system('sudo service network-manager stop')
-    setLogLevel('info')
+    setLogLevel('debug')
     topology(sys.argv)

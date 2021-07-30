@@ -24,16 +24,28 @@ def topology():
                           cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20)
     ap1 = net.addAccessPoint('ap1')
     c0 = net.addController('c0')
+    #d1 = net.addDocker('d1', ip='10.0.0.5', dimage="cornet:focalfoxyNWH")
+
+    #info('*** Adding switch\n')
+    #s1 = net.addSwitch('s1')
+
+    info("*** adding links")
+    #net.addLink(ap1,s1)
+    #net.addLink(d1,ap1)
 
     info('*** Configuring WiFi nodes\n')
     net.configureWifiNodes()
 
+    if '-p' not in args:
+        net.plotGraph(max_x=500, max_y=500)
+
     info('*** Starting network\n')
     net.build()
+    #s1.start([c0])
     ap1.start([c0])
 
-    makeTerm(sta1, cmd="bash -c 'apt-get update && apt-get install iw;'")
-    makeTerm(sta2, cmd="bash -c 'apt-get update && apt-get install iw;'")
+    #makeTerm(sta1, cmd="bash -c 'apt-get update && apt-get install iw;'")
+    #makeTerm(sta2, cmd="bash -c 'apt-get update && apt-get install iw;'")
 
     #sta1.cmd('iw dev sta1-wlan0 connect new-ssid')
     #sta2.cmd('iw dev sta2-wlan0 connect new-ssid')
