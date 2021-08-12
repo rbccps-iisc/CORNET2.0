@@ -30,7 +30,7 @@ def topology(args):
         image = config['image']
         string1 = ""
         string1 = string1.join(image)
-        print(string1)
+        #print(string1)
         # print(imag)
         sta_list = []
         ap_list = []
@@ -38,25 +38,33 @@ def topology(args):
         for idx, node in enumerate(models):
             position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
                 pose[idx]['position']['z'])
-            print(type(node), type(ip_list[idx]))
+            #print(type(node), type(ip_list[idx]))
 
             if node_type[idx] == "STATIC":
-                # sta_list.append(net.addStation('host%s'%idx, ip=ip_list[idx],
-                #                              cls=DockerSta, dimage=string1, cpu_shares=20))
-                ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', channel='6', position=position))
+                #sta_list.append(net.addStation('host%s' % idx, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
+                #                              cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
+                ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', position=position))
                 #FIXME add channel parameters as well to the config file.
 
-                # net.addLink(sta_list[idx], ap_list[idx], cls=TCLink)
+                #net.addLink(sta_list[idx], ap_list[idx])#, cls=TCLink)
             elif node_type[idx] == "MOBILE":
                 sta_list.append(net.addStation(node, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
                                                cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
+                #ap_list.append(0)
 
-
+        T_op= net.addStation('tele', ip='10.0.0.25', mac='00:02:00:00:00:20',
+                         cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='2,10,0')
         c0 = net.addController('c0')
 
         info("*** Configuring Propagation Model\n")
-        net.setPropagationModel(model="logDistance", exp=4.5)
+        net.setPropagationModel(model="logDistance", exp=5.5)
         # FIXME add propagation model as well to the config file.
+
+        info('*** Adding switches\n')
+        s1 = net.addSwitch('s1')
+
+        for ap in ap_list:
+            net.addLink(s1 , ap)
 
         info('*** Configuring WiFi nodes\n')
         net.configureWifiNodes()
@@ -67,6 +75,7 @@ def topology(args):
         info('*** Starting network\n')
         net.build()
         for ap in ap_list:
+            #if ap != 0:
             ap.start([c0])
         net.socketServer(ip='127.0.0.1', port=12345)
 

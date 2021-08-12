@@ -1,12 +1,18 @@
 gazebo_models:
 - robot0
 - robot1
+- robot2
+- robot3
 - ap_0
+- ap_1
 
 ip_list:
 - 10.0.0.1
 - 10.0.0.2
 - 10.0.0.3
+- 10.0.0.4
+- 10.0.0.5
+- 10.0.0.6
 
 pose:
 - position:
@@ -18,13 +24,29 @@ pose:
     y: 10
     z: 0
 - position:
+    x: 5
+    y: 20
+    z: 0
+- position:
+    x: 10
+    y: 5
+    z: 0
+- position:
     x: 1
     y: 10
     z: 0
+- position:
+    x: 1
+    y: 45
+    z: 0
+
 
 type:
 - MOBILE
 - MOBILE
+- MOBILE
+- MOBILE
+- STATIC
 - STATIC
 
 image:

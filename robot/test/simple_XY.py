@@ -35,18 +35,30 @@ if __name__ == '__main__':
     ap1 = ap1.replace("]", " ")
     print ap1
     # centre = list(ap1.split(","))
-    [x, y] = [0, 0]
+    args = sys.argv
+
+    if len(args) != 2:
+        #print("usage: network_config.py <config_file>")
+        print args[1]
+        [x, y] = [1, 0]
+    else:
+        print args[1]
+        [x, y] = [1, float(args[1])]
+
     while True:
-        x = x + 1
-        if x % 2 == 0:
-            y = y + 1
+        #x = x + 1
+        #if x % 2 == 0:
+        #    y = y + 1
+        y = y+0.5
         # getpoint(int(float(centre[1])),int(float(centre[2])), 60)
         #msg = 'set.mybot.setPosition("'
         msg = 'set.robot1.setPosition("'
-        msg = msg + str(int(x)) + ',' + str(int(y)) + ',0")'
+        msg = msg + str(float(x)) + ',' + str(float(y)) + ',0")'
         print msg
         result = client(msg)
         print client("get.robot1.position")
-        time.sleep(0.5)
-        if x == 300:
+
+        #print client("get.ap1.position")
+        time.sleep(1.0)
+        if y == 90:
             break

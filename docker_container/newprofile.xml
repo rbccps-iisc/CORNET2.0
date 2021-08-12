@@ -17,6 +17,11 @@
                             <address>10.0.0.2</address>
                         </udpv4>
                     </locator>
+                    <locator>
+                        <udpv4>
+                            <address>10.0.0.3</address>
+                        </udpv4>
+                    </locator>
                 </initialPeersList>
             </builtin>
         </rtps>

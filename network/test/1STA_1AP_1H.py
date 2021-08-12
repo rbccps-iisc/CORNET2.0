@@ -67,23 +67,23 @@ def topology(args):
     number_of_stations = 2
     staList = []
 
-    # net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
-    #                position='80,100,0')
-    #
-    # net.addStation('sta2', mac='00:00:00:00:00:05', ip='10.0.0.3/8',
-    #                position='70,100,0')
+    net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
+                    position='2,10,0')
+
+    net.addStation('sta2', mac='00:00:00:00:00:05', ip='10.0.0.3/8',
+                    position='10,10,0')
     info("*** Creating nodes\n")
     position = 60
-    for n in range(number_of_stations):
-        staList.append(net.addStation(
-            'sta%s' % (n+1), ip='10.0.0.%s/24' % (n+1), position='70,60,0' ))
+    #for n in range(number_of_stations):
+    #    staList.append(net.addStation(
+    #        'sta%s' % (n+1), ip='10.0.0.%s/24' % (n+1), position='70,60,0' ))
 
     h1 = net.addHost('h1', ip='10.0.0.25/8')#, position='5,0,0')
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='a', channel='36', position='100,100,0')
-    #ap2 = net.addAccessPoint('ap2', ssid='ssid-ap2', channel='6', position='200,100,0')
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='a', channel='36', position='1,10,0')
+    ap2 = net.addAccessPoint('ap2', ssid='ssid-ap2', position='1,45,0')
     internetIface = 'eno1'
     #root = net.addHost('root', ip='10.0.0.254/8', inNamespace=False)
-    net.setPropagationModel(model="logDistance", exp=3)
+    net.setPropagationModel(model="logDistance", exp=5.5)
     #net.setPropagationModel(model="logNormalShadowing", sL=2, exp=4, variance=2)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -91,13 +91,11 @@ def topology(args):
     info("*** Creating links\n")
     net.addLink(ap1, h1)
     #net.addLink(root, ap1)
-    info('*** Configuring WiFi nodes\n')
-    net.configureWifiNodes()
 
     #if '-p' not in args:
     #    net.plotGraph(max_x=500, max_y=500)
-    nodes = net.stations  #+ net.aps
-    net.telemetry(nodes=nodes, single=True, max_x=1000, max_y=1000, data_type='position')
+    nodes = net.stations + net.aps
+    net.telemetry(nodes=nodes, single=True, max_x=100, max_y=100, data_type='position')
     #stat = Stats(nodes)
     #stat.thread_ = thread(target=stat.start)
     #stat.thread_.daemon = True
@@ -111,7 +109,8 @@ def topology(args):
     net.build()
     c1.start()
     ap1.start([c1])
-    #ap2.start([c1])
+
+    ap2.start([c1])
 
     #fixNetworkManager( root, 'root-eth0' )
 
@@ -131,5 +130,5 @@ def topology(args):
 
 if __name__ == '__main__':
     os.system('sudo systemctl stop network-manager')
-    setLogLevel('info')
+    setLogLevel('debug')
     topology(sys.argv)

@@ -8,15 +8,15 @@ from containernet.net import Containernet
 from mininet.node import Controller
 from mininet.log import info, setLogLevel
 
-setLogLevel('info')
+setLogLevel('debug')
 
 net = Containernet(controller=Controller)
 
 info('*** Adding controller\n')
 net.addController('c0')
 info('*** Adding docker containers\n')
-d1 = net.addDocker('d1', ip='10.0.0.251', dimage="ubuntu:trusty")
-d2 = net.addDocker('d2', ip='10.0.0.252', dimage="ubuntu:trusty")
+d1 = net.addDocker('d1', ip='10.0.0.251', dimage="cornet:focalfoxyNWH")
+d2 = net.addDocker('d2', ip='10.0.0.252', dimage="cornet:focalfoxyNWH")
 info('*** Adding switches\n')
 s1 = net.addSwitch('s1')
 s2 = net.addSwitch('s2')
