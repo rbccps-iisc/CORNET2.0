@@ -1,0 +1,9 @@
+---
+- name: My task
+  hosts: all
+  tasks:
+     - name: ping all the robots
+       command: "python3 /home/ansible/ping_result.py"
+       register: result
+
+     - debug: var=result.stdout

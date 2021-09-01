@@ -1,0 +1,65 @@
+
+ ######  #######  #####   #####
+ #     # #     # #     # #     #
+ #     # #     # #             #
+ ######  #     #  #####   #####
+ #   #   #     #       # #
+ #    #  #     # #     # #
+ #     # #######  #####  #######
+
+FROM ros:galactic
+# Setup all the keys and install packages which need root access.
+USER root
+
+RUN . /opt/ros/galactic/setup.sh && \
+    apt-get update && \
+    apt-get install -y wget gnupg2 lsb-release && \
+    apt-get install -y python3-colcon-common-extensions && \
+    sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' && \
+    wget https://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add - && \
+    apt-get update && \
+    sudo apt-get install -y gazebo11 &&\
+    sudo apt-get install -y libignition-common3-graphics-dev
+
+
+RUN wget https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc -O - | sudo apt-key add - && \
+    sh -c 'echo "deb [arch=$(dpkg --print-architecture)] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2-latest.list'
+
+# install ros package
+RUN apt-get update && apt-get install -y \
+      ros-${ROS_DISTRO}-demo-nodes-cpp \
+      ros-${ROS_DISTRO}-demo-nodes-py
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install python3-pip -y && \
+    apt-get install python3-pip -y && \
+    pip3 install ansible
+
+
+  #####  ####### ######  #     # ####### #######  #####
+ #     # #     # #     # ##    # #          #    #     #
+ #       #     # #     # # #   # #          #          #
+ #       #     # ######  #  #  # #####      #     #####
+ #       #     # #   #   #   # # #          #    #
+ #     # #     # #    #  #    ## #          #    #
+  #####  ####### #     # #     # #######    #    #######
+
+RUN apt-get update && apt-get install -y \
+    net-tools \
+    ethtool \
+    iputils-ping \
+    iproute2 \
+    python3-setuptools \
+    python3-pip \
+    vim \
+    wavemon \
+    wireless-tools \
+    nmap \
+    traceroute \
+    netcat \
+    tcpdump \
+    iw
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
+
+RUN pip3 install -U pip setuptools
+RUN pip3 install roslibpy
