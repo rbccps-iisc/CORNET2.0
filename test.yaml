@@ -5,31 +5,34 @@ gazebo_models:
 - robot3
 - ap_0
 - ap_1
+- ap_2
+- ap_3
 
 ip_list:
-- 10.0.0.1
 - 10.0.0.2
 - 10.0.0.3
 - 10.0.0.4
 - 10.0.0.5
-- 10.0.0.6
-
+- 10.0.0.0
+- 10.0.0.0
+- 10.0.0.0
+- 10.0.0.0
 pose:
 - position:
     x: 2
-    y: 10
+    y: 40
     z: 0
 - position:
     x: 10
     y: 10
     z: 0
 - position:
-    x: 5
-    y: 20
+    x: 41
+    y: 38
     z: 0
 - position:
-    x: 10
-    y: 5
+    x: 41
+    y: 12
     z: 0
 - position:
     x: 1
@@ -39,6 +42,15 @@ pose:
     x: 1
     y: 45
     z: 0
+- position:
+    x: 45
+    y: 10
+    z: 0
+- position:
+    x: 45
+    y: 45
+    z: 0
+
 
 
 type:
@@ -48,9 +60,61 @@ type:
 - MOBILE
 - STATIC
 - STATIC
+- STATIC
+- STATIC
+
 
 image:
 - "cornet:focalfoxyNWH"
 
+robot_number: 4
+robot_information:
+  robot_namespace:
+    - "robot0"
+    - "robot1"
+    - "robot2"
+    - "robot3"
+  robot_pos_x:
+    - 2
+    - 10
+    - 2
+    - 20
+  robot_pos_y:
+    - 10
+    - 14
+    - 20
+    - 20
+  robot_pos_z:
+    - 0
+    - 0
+    - 0
+    - 0
+  robot_ip:
+    - 10.0.0.2
+    - 10.0.0.3
+    - 10.0.0.4
+    - 10.0.0.5
 
+access_points: 1
+static_information:
+  ap_namespace:
+    - "ap_0"
+    - "ap_1"
+    - "ap_2"
+    - "ap_3"
+  ap_pos_x:
+    - 30.0
+    - 1.0
+    - 45.0
+    - 45.0
+  ap_pos_y:
+    - 31.0
+    - 45.0
+    - 10.0
+    - 45.0
+  ap_pos_z:
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
 

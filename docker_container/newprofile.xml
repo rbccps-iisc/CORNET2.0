@@ -9,7 +9,7 @@
                 <initialPeersList>
                     <locator>
                         <udpv4>
-                            <address>10.0.0.1</address>
+                            <address>10.0.0.5</address>
                         </udpv4>
                     </locator>
                     <locator>
@@ -20,6 +20,11 @@
                     <locator>
                         <udpv4>
                             <address>10.0.0.3</address>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>10.0.0.4</address>
                         </udpv4>
                     </locator>
                 </initialPeersList>

@@ -1,0 +1,1 @@
+BoolArray[] allpings

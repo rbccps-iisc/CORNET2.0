@@ -73,38 +73,26 @@ if __name__ == '__main__':
     #         time.sleep(1)
     #     except KeyboardInterrupt:
     #         break
+    robots = ['robot0', 'robot1', 'robot2', 'robot3']
     while True:
         try:
-            rclpy.init(args=sys.argv)
-            R1 = RclpyClient()
-            R1.send_request('name_robo0')
-            rclpy.spin_once(R1)
-            if R1.response.done():
-                result = R1.response.result()
-                print (result.state.pose.position.x, result.state.pose.position.y)
-                x = result.state.pose.position.x
-                y = result.state.pose.position.y
-                #print(x,y)
-                msg = 'set.mybot1.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
-                result = R1.client(msg)
-            #R1.destroy_node()
-            rclpy.shutdown()
-            time.sleep(1)
+            for robot in robots:
+                rclpy.init(args=sys.argv)
+                R1 = RclpyClient()
+                R1.send_request(str(robot))
+                rclpy.spin_once(R1)
+                if R1.response.done():
+                    result = R1.response.result()
+                    print (result.state.pose.position.x, result.state.pose.position.y)
+                    x = result.state.pose.position.x
+                    y = result.state.pose.position.y
+                    #print(x,y)
+                    msg = 'set.'+ robot +'.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
+                    result = R1.client(msg)
+                #R1.destroy_node()
+                rclpy.shutdown()
+                time.sleep(0.4)
 
-            rclpy.init(args=sys.argv)
-            R2 = RclpyClient()
-            R2.send_request('name_robo1')
-            rclpy.spin_once(R2)
-            if R2.response.done():
-                result2 = R2.response.result()
-                print (result2.state.pose.position.x, result2.state.pose.position.y)
-                x = result2.state.pose.position.x
-                y = result2.state.pose.position.y
-                #print(x,y)
-                msg = 'set.mybot2.setPosition("' + str(int(x)) + ',' + str(int(y)) + ',0")'
-                result = R2.client(msg)
-            #R2.destroy_node()
-            rclpy.shutdown()
 
         except KeyboardInterrupt:
             break

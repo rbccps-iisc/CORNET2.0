@@ -52,19 +52,10 @@ CMD    ["/usr/sbin/sshd", "-D"]
 
 RUN mkdir -p /home/ansible
 
-COPY ansible/* /home/ansible/
-
 ENV ROS2_WS  /home/ros2_ws
 
 RUN mkdir -p $ROS2_WS
 RUN mkdir -p $ROS2_WS/src
-
-COPY heartbeat/* /home/ros2_ws/src/heartbeat/
-
-RUN cd $ROS2_WS \
-    && . /opt/ros/foxy/setup.sh \
-    && colcon build \
-    && . $ROS2_WS/install/setup.sh
 
 
 #FASTRTPS Whitelisting
@@ -102,3 +93,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
 RUN pip3 install -U pip setuptools 
 RUN pip3 install roslibpy
 
+
+COPY warehouse_interfaces/ /home/ros2_ws/src/warehouse_interfaces/
+
+COPY ansible/ /home/ansible/
+
+COPY heartbeat/ /home/ros2_ws/src/heartbeat/
+
+RUN cd $ROS2_WS \
+    && . /opt/ros/foxy/setup.sh \
+    && colcon build \
+    && . $ROS2_WS/install/setup.sh

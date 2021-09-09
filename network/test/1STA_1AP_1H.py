@@ -68,10 +68,10 @@ def topology(args):
     staList = []
 
     net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
-                    position='2,10,0')
+                    position='0,0,0')
 
-    net.addStation('sta2', mac='00:00:00:00:00:05', ip='10.0.0.3/8',
-                    position='10,10,0')
+    #net.addStation('sta2', mac='00:00:00:00:00:05', ip='10.0.0.3/8',
+    #                position='10,10,0')
     info("*** Creating nodes\n")
     position = 60
     #for n in range(number_of_stations):

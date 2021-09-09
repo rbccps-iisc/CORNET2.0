@@ -3,7 +3,7 @@
 add
 """
 from containernet.net import Containernet
-from containernet.node import DockerSta
+from containernet.node import DockerSta, Docker
 from containernet.cli import CLI
 from containernet.term import makeTerm
 from mininet.log import info, setLogLevel
@@ -43,40 +43,51 @@ def topology(args):
             if node_type[idx] == "STATIC":
                 #sta_list.append(net.addStation('host%s' % idx, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
                 #                              cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
-                ap_list.append(net.addAccessPoint(node, ssid='new-ssid', mode='g', position=position))
+                ap = idx%4
+                ap_list.append(net.addAccessPoint(node, ssid='new-ssid%s' %ap, mode='g', position=position,
+                                                  failMode="standalone"))
                 #FIXME add channel parameters as well to the config file.
 
                 #net.addLink(sta_list[idx], ap_list[idx])#, cls=TCLink)
             elif node_type[idx] == "MOBILE":
-                sta_list.append(net.addStation(node, ip=ip_list[idx], mac='00:02:00:00:00:1%s' % idx,
+                sta_list.append(net.addStation(node, ip=ip_list[idx],
                                                cls=DockerSta, dimage=string1, cpu_shares=20, position=position))
                 #ap_list.append(0)
 
-        T_op= net.addStation('tele', ip='10.0.0.25', mac='00:02:00:00:00:20',
-                         cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='2,10,0')
-        c0 = net.addController('c0')
+        #T_op= net.addStation('tele', ip='10.0.0.1', mac='00:02:00:00:00:20',
+        #                 cls=DockerSta, dimage="cornet:focalfoxyNWH", cpu_shares=20, position='2,10,0')
+        #c0 = net.addController('c0')
+        h1 = net.addHost('h1', ip='10.0.0.1/24', cls=Docker, dimage="cornet:focalfoxyNWH", cpu_shares=20)
 
         info("*** Configuring Propagation Model\n")
         net.setPropagationModel(model="logDistance", exp=5.5)
         # FIXME add propagation model as well to the config file.
 
-        info('*** Adding switches\n')
-        s1 = net.addSwitch('s1')
+        #info('*** Adding switches\n')
+        #s1 = net.addSwitch('s1')
 
-        for ap in ap_list:
-            net.addLink(s1 , ap)
+        #for ap in ap_list:
+        #    net.addLink(s1 , ap)
 
         info('*** Configuring WiFi nodes\n')
         net.configureWifiNodes()
 
         if '-p' not in args:
-            net.plotGraph(max_x=200, max_y=200)
+            net.plotGraph(max_x=100, max_y=100)
+
+        for sta in sta_list:
+            sta.cmd('service ssh restart')
+
+        h1.cmd('service ssh restart')
 
         info('*** Starting network\n')
         net.build()
         for ap in ap_list:
             #if ap != 0:
-            ap.start([c0])
+            ap.start([])
+            ap.cmd("ovs-ofctl add-flow %s priority=1,arp,actions=flood" % ap)
+
+
         net.socketServer(ip='127.0.0.1', port=12345)
 
         info('*** Running CLI\n')

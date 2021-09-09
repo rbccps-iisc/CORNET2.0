@@ -21,9 +21,9 @@ def pingOk(sHost):
 
     return True
 
-result = my_dictionary()
+result = []#my_dictionary()
 with open("/home/ansible/robot") as fp:
     lines = fp.readlines()
     for line in lines:
-        result.add(line, pingOk(line))
+        result.append(pingOk(line))#add(line, pingOk(line))
 print (result)
