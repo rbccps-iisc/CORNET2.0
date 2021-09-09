@@ -28,3 +28,10 @@ For network realization, we use Mininet Wi-Fi; the dependent packages need to in
 The Docker with ROS2 support provided in docker_container folder along with other wireless tools for testing and evaluation.
 
 build.sh script will build and tag the images required for running. you can add you own Dockerfile based on the file Dockerfile
+
+### Prebuilt docker image
+You can also use a pre-built docker image which can be downloaded from [here](https://drive.google.com/file/d/1PNWrrP4M3ikoyO_3HJ730YSZ5dLxTIO7/view?usp=sharing)
+then you can load the image with the following command:
+```
+docker load -i containernet_foxy.tar
+```
