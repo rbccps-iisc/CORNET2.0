@@ -9,7 +9,7 @@ CORNET 2.0 is more generic framework that can be integrated with any robotic fra
 
 For network realization, we use Mininet Wi-Fi; the dependent packages need to installed as mentioned in mininet wifi documentation. If you find this code useful in your research, please consider citing:  
 ```
-   @INPROCEEDINGS{Acha2201:CORNET,
+@INPROCEEDINGS{Acha2201:CORNET,
 AUTHOR="Srikrishna Acharya and Bharadwaj Amrutur and Mukunda Bharatheesha and
 Yogesh Simmhan",
 TITLE="{CORNET} {2.0:} A {Co-Simulation} Middleware for Robot Networks",
