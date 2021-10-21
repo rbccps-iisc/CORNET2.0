@@ -26,6 +26,10 @@ YEAR=2022
 
 **We highly recommend using Ubuntu version 16.04 or higher. Some new hostapd features might not work on Ubuntu 14.04.**
 
+     sudo apt install libnl-route-3-dev
+     pip3 install docker-py
+     sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1 
+     
      sudo apt-get install git
      sudo apt-get install ansible git aptitude
      git clone https://github.com/ramonfontes/containernet.git
