@@ -7,17 +7,15 @@ CORNET 1.0 integrates Ardupilot SITL in Gazebo and NS3 and the source code is av
 
 CORNET 2.0 is more generic framework that can be integrated with any robotic framework that supports ROS. This code was tested on an Ubuntu 16.04 and Ubuntu 18.04 system.
 
-For network realization, we use Mininet Wi-Fi; the dependent packages need to installed as mentioned in mininet wifi documentation. If you find this code useful in your research, please consider citing:  
+For network realization, we use Mininet Wi-Fi; the dependent packages need to installed as mentioned in mininet wifi documentation. This work is submitted for review (COMSNETS 2022). If you find this code useful in your research, please consider citing:  
 ```
-@INPROCEEDINGS{Acha2201:CORNET,
-AUTHOR="Srikrishna Acharya and Bharadwaj Amrutur and Mukunda Bharatheesha and
-Yogesh Simmhan",
-TITLE="{CORNET} {2.0:} A {Co-Simulation} Middleware for Robot Networks",
-BOOKTITLE="2022 14th International Conference on COMmunication Systems \& NETworkS
-(COMSNETS) (COMSNETS 2022)",
-ADDRESS="Bangalore, India",
-MONTH=jan,
-YEAR=2022
+@misc{acharya2021cornet,
+      title={CORNET 2.0: A Co-Simulation Middleware forRobot Networks}, 
+      author={Srikrishna Acharya and Bharadwaj Amrutur and Mukunda Bharatheesha and Yogesh Simmhan},
+      year={2021},
+      eprint={2109.06979},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO}
 }
 ```
 
