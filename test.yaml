@@ -67,33 +67,55 @@ type:
 image:
 - "cornet:focalfoxyNWH"
 
-robot_number: 4
+robot_number: 2
+robot_model: "burger"
+spawn_robots: True # If set to False only the robot state publisher is launched
 robot_information:
   robot_namespace:
     - "robot0"
     - "robot1"
     - "robot2"
     - "robot3"
+    - "robot4"
+    - "robot5"
+    - "robot6"
+    - "robot7"
   robot_pos_x:
-    - 2
-    - 10
-    - 2
-    - 20
+    - -2.08
+    - -0.40
+    - -1.84
+    - -0.49
+    - -1.84
+    - -0.46
+    - -1.88
+    - -0.65
   robot_pos_y:
-    - 10
-    - 14
-    - 20
-    - 20
+    - -4.86
+    - -4.94
+    - -3.28
+    - -3.28
+    - -1.79
+    - -1.78
+    - -0.19
+    - -0.15
   robot_pos_z:
-    - 0
-    - 0
-    - 0
-    - 0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
+    - 0.0
   robot_ip:
     - 10.0.0.2
     - 10.0.0.3
     - 10.0.0.4
     - 10.0.0.5
+    - 10.0.0.6
+    - 10.0.0.7
+    - 10.0.0.8
+    - 10.0.0.9
 
 access_points: 1
 static_information:
@@ -103,12 +125,12 @@ static_information:
     - "ap_2"
     - "ap_3"
   ap_pos_x:
-    - 30.0
+    - -5.0
     - 1.0
     - 45.0
     - 45.0
   ap_pos_y:
-    - 31.0
+    - 9.0
     - 45.0
     - 10.0
     - 45.0

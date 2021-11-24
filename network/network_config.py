@@ -35,20 +35,13 @@ def topology(args):
         sta_list = []
         ap_list = []
         info('*** Adding docker containers\n')
-        f = 0
         for robot_no in range(0, num_robots):
             position = str(
                 str(robot_information["robot_pos_x"][robot_no]) + "," + str(robot_information["robot_pos_y"][robot_no])
                 + "," + str(robot_information["robot_pos_z"][robot_no]))
-            if f==0:
-                c=1
-                f=1
-            else:
-                c=6
-                f=0
             sta_list.append(net.addStation(robot_information["robot_namespace"][robot_no],
                                            ip=robot_information["robot_ip"][robot_no], cls=DockerSta,
-                                           dimage=string1, channel=c, position=position))
+                                           dimage=string1, position=position))
 
         for ap_no in range(0, num_aps):
             position = str(str(static_information["ap_pos_x"][ap_no]) + "," + str(static_information["ap_pos_y"][ap_no])
@@ -63,7 +56,7 @@ def topology(args):
 
 
         info("*** Configuring Propagation Model\n")
-        net.setPropagationModel(model="logDistance", exp=4)
+        net.setPropagationModel(model="logDistance", exp=5.5)
         #FIXME add propagation model as well to the config file.
 
         # info('*** Adding switches\n')
@@ -77,7 +70,7 @@ def topology(args):
         net.configureWifiNodes()
 
         if '-p' not in args:
-            net.plotGraph(max_x=100, max_y=100)
+            net.plotGraph(min_x=-15, max_x=15, min_y=-15, max_y=15)
 
         for sta in sta_list:
             sta.cmd('service ssh restart')

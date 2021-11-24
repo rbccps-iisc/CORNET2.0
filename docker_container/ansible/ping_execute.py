@@ -24,7 +24,7 @@ def main():
         robot_filter = re.findall(r'ok: \[[^\]]*\] =>', stdout)
         #print (robot_filter)
 
-        robots = ['172.17.0.2', '172.17.0.3', '172.17.0.4', '172.17.0.5']
+        robots = ['172.17.0.2', '172.17.0.3']
         #FIXME: get from hosts
         a = []
         result = []
