@@ -9,7 +9,7 @@ server_address = '/tmp/uds_socket'
 print >>sys.stderr, 'connecting to %s' % server_address
 try:
     sock.connect(server_address)
-except socket.error, msg:
+except socket.error as msg:
     print >>sys.stderr, msg
     sys.exit(1)
 try:

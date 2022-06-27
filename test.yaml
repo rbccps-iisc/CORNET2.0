@@ -67,7 +67,7 @@ type:
 image:
 - "cornet:focalfoxyNWH"
 
-robot_number: 2
+robot_number: 4
 robot_model: "burger"
 spawn_robots: True # If set to False only the robot state publisher is launched
 robot_information:
@@ -117,23 +117,26 @@ robot_information:
     - 10.0.0.8
     - 10.0.0.9
 
-access_points: 1
+access_points: 5
 static_information:
   ap_namespace:
     - "ap_0"
     - "ap_1"
     - "ap_2"
     - "ap_3"
+    - "ap_4"
   ap_pos_x:
-    - -5.0
+    - 1.0
     - 1.0
     - 45.0
     - 45.0
+    - 25.0
   ap_pos_y:
-    - 9.0
+    - 10.0
     - 45.0
     - 10.0
     - 45.0
+    - 25.0
   ap_pos_z:
     - 0.0
     - 0.0

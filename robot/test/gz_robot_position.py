@@ -61,8 +61,8 @@ class GzClient:
                     result = self.client(''.join([str(item) for item in self.msg]))
                     logging.debug(result)
                     time.sleep(1)
-        except Exception, e:
-            print " failed: %s" % e
+        except Exception as e:
+            print(" failed: %s" % e)
 
     def client(self, msg):
         # while msg != 'q' and msg != 'exit':

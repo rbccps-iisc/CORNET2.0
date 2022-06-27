@@ -56,7 +56,7 @@ def topology(args):
 
 
         info("*** Configuring Propagation Model\n")
-        net.setPropagationModel(model="logDistance", exp=5.5)
+        net.setPropagationModel(model="logDistance", exp=6)
         #FIXME add propagation model as well to the config file.
 
         # info('*** Adding switches\n')
@@ -70,7 +70,8 @@ def topology(args):
         net.configureWifiNodes()
 
         if '-p' not in args:
-            net.plotGraph(min_x=-15, max_x=15, min_y=-15, max_y=15)
+            #net.plotGraph(min_x=-15, max_x=15, min_y=-15, max_y=15)
+	     net.plotGraph(max_x=50, max_y=50)
 
         for sta in sta_list:
             sta.cmd('service ssh restart')

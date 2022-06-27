@@ -60,7 +60,7 @@ def topology(args):
         h1 = net.addHost('h1', ip='10.0.0.1/24', cls=Docker, dimage="cornet:focalfoxyNWH", cpu_shares=20)
 
         info("*** Configuring Propagation Model\n")
-        net.setPropagationModel(model="logDistance", exp=5.5)
+        net.setPropagationModel(model="logDistance", exp=6.5)
         # FIXME add propagation model as well to the config file.
 
         #info('*** Adding switches\n')

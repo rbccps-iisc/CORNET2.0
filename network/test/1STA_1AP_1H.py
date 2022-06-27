@@ -66,9 +66,12 @@ def topology(args):
     info("*** Creating nodes\n")
     number_of_stations = 2
     staList = []
+    number_of_congestion = 5
 
-    net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.1/8',
+    net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.30/8',
                     position='0,0,0')
+    for n in range(number_of_congestion):
+        net.addStation('con%s' % (n+1), ip='10.0.0.%s/8' % (n+1), position='0,%s,0'%(n) )
 
     #net.addStation('sta2', mac='00:00:00:00:00:05', ip='10.0.0.3/8',
     #                position='10,10,0')
@@ -80,10 +83,10 @@ def topology(args):
 
     h1 = net.addHost('h1', ip='10.0.0.25/8')#, position='5,0,0')
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', mode='a', channel='36', position='1,10,0')
-    ap2 = net.addAccessPoint('ap2', ssid='ssid-ap2', position='1,45,0')
-    internetIface = 'eno1'
+    #ap2 = net.addAccessPoint('ap2', ssid='ssid-ap2', position='1,45,0')
+    #internetIface = 'eno1'
     #root = net.addHost('root', ip='10.0.0.254/8', inNamespace=False)
-    net.setPropagationModel(model="logDistance", exp=5.5)
+    net.setPropagationModel(model="logDistance", exp=4.5)
     #net.setPropagationModel(model="logNormalShadowing", sL=2, exp=4, variance=2)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
@@ -94,8 +97,8 @@ def topology(args):
 
     #if '-p' not in args:
     #    net.plotGraph(max_x=500, max_y=500)
-    nodes = net.stations + net.aps
-    net.telemetry(nodes=nodes, single=True, max_x=100, max_y=100, data_type='position')
+    #nodes = net.stations + net.aps
+    #net.telemetry(nodes=nodes, single=True, max_x=100, max_y=100, data_type='position')
     #stat = Stats(nodes)
     #stat.thread_ = thread(target=stat.start)
     #stat.thread_.daemon = True
@@ -109,8 +112,6 @@ def topology(args):
     net.build()
     c1.start()
     ap1.start([c1])
-
-    ap2.start([c1])
 
     #fixNetworkManager( root, 'root-eth0' )
 

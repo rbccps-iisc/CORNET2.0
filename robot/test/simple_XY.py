@@ -25,7 +25,7 @@ if __name__ == '__main__':
     ap1 = unicodedata.normalize('NFKD', ap1).encode('ascii', 'ignore')
     ap1 = ap1.replace("[", " ")
     ap1 = ap1.replace("]", " ")
-    print ap1
+    print( ap1)
     # centre = list(ap1.split(","))
     args = sys.argv
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         [x, y] = [1, 0]
 
     else:
-        print args[1], args[2]
+        print( args[1], args[2])
         [x, y] = [args[1], float(args[2])]
 
 

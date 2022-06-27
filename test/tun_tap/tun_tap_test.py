@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 import subprocess
 
 import ipaddress as ipaddress
@@ -7,12 +8,16 @@ import select
 import os
 import sys
 
+import sys
+if sys.version_info[0] >= 3:
+    unicode = str
+
 import multiprocessing as multiprocessing
 import threading
-import dpkt
-from scapy.all import *
-from scapy.layers.inet import IP
-from scapy.layers.l2 import Ether
+#import dpkt
+#from scapy.all import *
+#from scapy.layers.inet import IP
+#from scapy.layers.l2 import Ether
 
 ip_list = ['10.8.0.1', '10.8.0.2']  # ,"10.8.0.3","10.8.0.4"]
 num_ips = len(ip_list)
@@ -83,23 +88,23 @@ def _read_from_tuns( i, tuns):
             print("TUN " + str(i) + " seems to be gone, can't read from it")
             break
 
-        # identify IPs and save into buffer
-        try:
-            #print data
-            #print data[0]#, data.encode('hex')
-            packet = IP(data)
-            if packet.fields['version'] == 4:
-                print packet.show()
-
-            #version = data[0]
-            #print ("version ",type(version))
-            #version = version >> 4
-            #if version == 4:
-            #   ip_src = int.from_bytes(data[12:16], byteorder="big")
-            #    ip_dst = int.from_bytes(data[16:20], byteorder="big")
-            #   print(ip_src, ip_dst, data)
-        except ValueError, e:
-            print e
+        # # identify IPs and save into buffer
+        # try:
+        #     #print data
+        #     #print data[0]#, data.encode('hex')
+        #     packet = IP(data)
+        #     if packet.fields['version'] == 4:
+        #         print packet.show()
+        #
+        #     #version = data[0]
+        #     #print ("version ",type(version))
+        #     #version = version >> 4
+        #     #if version == 4:
+        #     #   ip_src = int.from_bytes(data[12:16], byteorder="big")
+        #     #    ip_dst = int.from_bytes(data[16:20], byteorder="big")
+        #     #   print(ip_src, ip_dst, data)
+        # except ValueError, e:
+        #     print e
 
 
 
@@ -107,7 +112,7 @@ def _read_from_tuns( i, tuns):
     tuns[i].close()
 
 if str(sys.argv[1])== 'start':
-    print "start"
+    print("start")
     _setup_network(ip_list)
 
     ip_to_tun_map = {int(ipaddress.IPv4Address(unicode(ip_i))): i for i, ip_i in enumerate(ip_list)}
@@ -131,6 +136,6 @@ elif str(sys.argv[1]) =='stop':
     _remove_network(len(ip_list))
 
 else:
-    print "nothing"
+    print ("nothing")
 
-print 'Argument List:', str(sys.argv)
+print ('Argument List:', str(sys.argv))
