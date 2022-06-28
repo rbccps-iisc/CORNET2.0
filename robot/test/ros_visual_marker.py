@@ -30,15 +30,15 @@ def get_pose(msg):
     # print(robots.index(recv_robot))
     # index = robots.index(recv_robot)
     ns_msg[1] = wifi_stations[robots.index(recv_robot)]
-    ns_msg[6] = msg.pose.position.x  # .decode('utf-8')
+    ns_msg[6] = msg.pose.position.x
     ns_msg[8] = msg.pose.position.y
     ns_msg[10] = msg.pose.position.z
-
     try:
         #sock.connect(server_address)
         # print(''.join([str(item) for item in ns_msg]))
-        sock.sendall(''.join([str(item) for item in ns_msg]))
+        sock.sendall(''.join([str(item) for item in ns_msg]).encode('utf-8'))
         # print(client(''.join([str(item) for item in ns_msg])))
+        rospy.sleep(0.5)
     except socket.error as msg:
         print( msg)
         #sys.exit(1)
@@ -50,8 +50,7 @@ def get_pose(msg):
 def robot_position_listener():
     rospy.init_node('listener', anonymous=True)
     rospy.Subscriber("/visualization_marker", Marker, get_pose)
-
-    # spin() simply keeps python from exiting until this node is stopped
+        # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
 

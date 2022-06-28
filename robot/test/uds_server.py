@@ -3,6 +3,7 @@ import socket
 import socket
 import sys
 import os
+import time
 
 server_address = '/tmp/uds_socket'
 
@@ -38,13 +39,14 @@ def mininet_client(msg):
 
 while True:
     # Wait for a connection
-    print >> sys.stderr, 'waiting for a connection'
+    print('waiting for a connection')
     connection, client_address = sock.accept()
     try:
-        data = connection.recv(1024)
-        if data:
-            print(data)
-            print(mininet_client(data))
+        while True:
+            data = connection.recv(1024).decode('utf-8')
+            if data:
+                print(data)
+                print(mininet_client(data))
     finally:
         # Clean up the connection
         connection.close()
