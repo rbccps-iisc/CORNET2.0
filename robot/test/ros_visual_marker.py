@@ -11,17 +11,27 @@ import socket
 # Connect the socket to the port where the server is listening
 server_address = '/tmp/uds_socket'
 
-# Create a UDS socket
-sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-print ('connecting to %s' % server_address)
-sock.connect(server_address)
+
+
 
 robots = ['/charlie', '/snoopy', '/spike']
 wifi_stations = ['sta1', 'sta2', 'sta3']
 ns_msg = ["set.", "station", ".setPosition", "(", "\"", "'", "xPosition", ",", "yPosition", ",", "zPosition", "\"", ")",
           "'"]
 
+
+def mininet_client(msg):
+    host = '127.0.0.1'
+    port = 12345
+    # while msg != 'q' and msg != 'exit':
+    s = socket.socket()
+    s.connect((host, port))
+    s.send(str(msg).encode('utf-8'))
+    data = s.recv(1024).decode('utf-8')
+    #print('Received from Server: ', data)
+    s.close()
+    return data
 
 def get_pose(msg):
     recv_robot = msg.ns
@@ -34,16 +44,21 @@ def get_pose(msg):
     ns_msg[8] = msg.pose.position.y
     ns_msg[10] = msg.pose.position.z
     try:
-        #sock.connect(server_address)
-        # print(''.join([str(item) for item in ns_msg]))
+        # Create a UDS socket
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        #print('connecting to %s' % server_address)
+        sock.connect(server_address)
+        print(''.join([str(item) for item in ns_msg]))
         sock.sendall(''.join([str(item) for item in ns_msg]).encode('utf-8'))
-        # print(client(''.join([str(item) for item in ns_msg])))
-        rospy.sleep(0.5)
+        sock.close()
+        #sock.sendall(":SEND\n".encode('utf-8'))
+        #print(mininet_client(''.join([str(item) for item in ns_msg])))
+        rospy.sleep(1)
     except socket.error as msg:
-        print( msg)
+        print(msg)
         #sys.exit(1)
     finally:
-        print ('closing socket')
+        print('closing socket')
         #close(sock)
         #sock.close()
 

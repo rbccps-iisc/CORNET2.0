@@ -4,6 +4,7 @@ import socket
 import sys
 import os
 import time
+from threading import Thread as thread
 
 server_address = '/tmp/uds_socket'
 
@@ -36,17 +37,38 @@ def mininet_client(msg):
     s.close()
     return data
 
+def get_socket_data( conn, addr):
+    while True:
+        try:
+            data = conn.recv(1024).decode('utf-8')
+            if data:
+               print('received "%s"' % data)
+               print(mininet_client(data.strip()))
+            else:
+                print('no more data from', addr)
+
+            break
+        except socket.error as msg:
+            print(msg)
+            break
 
 while True:
     # Wait for a connection
     print('waiting for a connection')
     connection, client_address = sock.accept()
+    #connection.setblocking(0)
     try:
-        while True:
-            data = connection.recv(1024).decode('utf-8')
-            if data:
-                print(data)
-                print(mininet_client(data))
+        thread(target=get_socket_data, args=(connection, client_address)).start()
+        # while True:
+        #     data = connection.recv(1024).decode('utf-8')
+        #     if data:
+        #         print('received "%s"' % data)
+        #         print(mininet_client(data.strip()))
+
+
+    except socket.error as msg:
+        print(msg)
+        #sys.exit(1)
     finally:
         # Clean up the connection
         connection.close()

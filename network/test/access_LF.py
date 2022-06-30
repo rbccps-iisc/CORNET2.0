@@ -20,7 +20,10 @@ class Stats:
     def __init__(self, nodes):
         self.nodes = nodes
         self.filename = '{}-mn-telemetry.txt'
+        self.stats_file = '{}-mn-stats.txt'
         self.thread_ = None
+        self.dir = 'cat /sys/class/ieee80211/{}/device/net/{}/statistics/{}'
+        self.data_type = 'tx_bytes'
 
     @classmethod
     def get_ifaces(cls, nodes, inNamespaceNodes, phys):
@@ -93,11 +96,25 @@ class Stats:
         while self.thread_._keep_alive:
             for node in self.nodes:
                 x, y, z = mn_wifi.telemetry.get_position(node)
-                time.sleep(1)
                 for wlan in range(len(node.params['wlan'])):
                     names.append(self.ifaces[node][wlan])
                     nodes_x[node], nodes_y[node] = [], []
                     rssi = mn_wifi.telemetry.get_rssi(node, self.ifaces[node][wlan])
+                    arr = self.nodes.index(node)
+                    if isinstance(node, AP):
+                        tx_bytes = subprocess.check_output(
+                            ("%s" % self.dir).format(self.phys[arr],
+                                                     self.ifaces[node][wlan],
+                                                     self.data_type),
+                            shell=True).decode().split("\n")
+                    else:
+                        tx_bytes = subprocess.check_output(
+                            '%s %s ' % (util_dir, node) +
+                            ('%s' % self.dir).format(self.phys[arr],
+                                                     self.ifaces[node][wlan],
+                                                     self.data_type),
+                            shell=True).decode().split("\n")
+                    mn_wifi.telemetry.get_values_from_statistics(tx_bytes, time_, node, self.stats_file)
                     os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, rssi, self.filename.format(node)))
 
 
@@ -125,13 +142,13 @@ def topology(args):
     info("*** Creating links\n")
 
     nodes = net.stations + net.aps
-    net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
+    #net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
 
-    # stat = Stats(nodes)
-    # stat.thread_ = thread(target=stat.start)
-    # stat.thread_.daemon = True
-    # stat.thread_._keep_alive = True
-    # stat.thread_.start()
+    stat = Stats(nodes)
+    stat.thread_ = thread(target=stat.start)
+    stat.thread_.daemon = True
+    stat.thread_._keep_alive = True
+    stat.thread_.start()
 
     info('*** Starting network\n')
     net.build()
