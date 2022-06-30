@@ -76,6 +76,20 @@ class Stats:
         ifaces = cls.get_ifaces(nodes, inNamespaceNodes, phy_list)
         return phy_list, ifaces
 
+    def get_ping(self, node):
+        cmd = '~/ping_s.sh 10.0.0.1'
+        isAP = False
+
+        if isinstance(node, AP) and not isAP:
+            result= subprocess.check_output(cmd,
+                                            shell=True, executable='/bin/bash').decode()#.split("\n")
+            isAP = True
+        else:
+            if not isinstance(node, AP):
+                result = subprocess.check_output('%s %s %s' % (util_dir, node, cmd),
+                                                shell=True, executable='/bin/bash').decode()#.split("\n")
+        return result
+
     def start(self):
 
         inNamespaceNodes = []
@@ -100,53 +114,8 @@ class Stats:
                     names.append(self.ifaces[node][wlan])
                     nodes_x[node], nodes_y[node] = [], []
                     rssi = mn_wifi.telemetry.get_rssi(node, self.ifaces[node][wlan])
-                    os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, rssi, self.filename.format(node)))
-
-
-class Ping:
-    def __init__(self, nodes, net):
-        self.nodes = nodes
-        self.thread_ = None
-        self.filename = '{}-mn-ping_position.txt'
-
-    def get_ping(self, node):
-        cmd = 'ping 10.0.0.1 -c 1'
-        isAP = False
-        #ping_status = subprocess.check_output(cmd, shell=True).decode()
-        if isinstance(node, AP) and not isAP:
-            ping_status = subprocess.check_output(cmd,
-                                                  shell=True).decode().split("\n")
-            isAP = True
-        else:
-            if not isinstance(node, AP):
-                ping_status = subprocess.check_output('%s %s %s' % (util_dir, node, cmd),
-                                                      shell=True).decode().split("\n")
-        return ping_status
-
-    def start(self):
-        time_ = time.time() - start
-        inNamespaceNodes = []
-        names = []
-
-        for node in self.nodes:
-            if not isinstance(node, AP):
-                inNamespaceNodes.append(node)
-            if os.path.exists('%s' % (self.filename.format(node))):
-                os.system('rm %s' % (self.filename.format(node)))
-            if node.name not in names:
-                names.append(node.name)
-
-        while self.thread_._keep_alive:
-            for node in self.nodes:
-                x, y, z = mn_wifi.telemetry.get_position(node)
-                try:
-                    status= self.get_ping(node)
-                except:
-                    status = 'No ping'
-
-                os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, status, self.filename.format(node)))
-
-
+                    ping = self.get_ping(node)
+                    os.system("echo '%s, %s, %s, %s, %s' >> %s" % (time_, x, y, rssi, ping, self.filename.format(node)))
 
 def topology(args):
     "Create a network."
@@ -161,17 +130,17 @@ def topology(args):
                           position='0,0,0', **kwargs)
     sta2 = net.addStation('sta2', ip6='fe80::2',
                           position='5,5,0', **kwargs)
-    sta3 = net.addStation('sta3', ip6='fe80::3',
-                          position='5,-5,0', **kwargs)
+    #sta3 = net.addStation('sta3', ip6='fe80::3',
+    #                      position='5,-5,0', **kwargs)
 
-    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', position='1,10,0')
+    ap1 = net.addAccessPoint('ap1', ssid='new-ssid', position='10,0,0')
     net.setPropagationModel(model="logDistance", exp=4)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
     info("*** Creating links\n")
 
-    nodes = net.stations + net.aps
+    nodes = net.stations #+ net.aps
     # net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
 
     stat = Stats(nodes)

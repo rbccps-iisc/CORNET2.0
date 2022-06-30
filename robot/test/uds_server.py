@@ -25,6 +25,7 @@ sock.bind(server_address)
 # Listen for incoming connections
 sock.listen(1)
 
+
 def mininet_client(msg):
     host = '127.0.0.1'
     port = 12345
@@ -37,13 +38,14 @@ def mininet_client(msg):
     s.close()
     return data
 
-def get_socket_data( conn, addr):
+
+def get_socket_data(conn, addr):
     while True:
         try:
             data = conn.recv(1024).decode('utf-8')
             if data:
-               print('received "%s"' % data)
-               print(mininet_client(data.strip()))
+                print('received "%s"' % data)
+                print(mininet_client(data.strip()))
             else:
                 print('no more data from', addr)
 
@@ -52,11 +54,12 @@ def get_socket_data( conn, addr):
             print(msg)
             break
 
+
 while True:
     # Wait for a connection
     print('waiting for a connection')
     connection, client_address = sock.accept()
-    #connection.setblocking(0)
+    # connection.setblocking(0)
     try:
         thread(target=get_socket_data, args=(connection, client_address)).start()
         # while True:
@@ -68,7 +71,7 @@ while True:
 
     except socket.error as msg:
         print(msg)
-        #sys.exit(1)
+        # sys.exit(1)
     finally:
         # Clean up the connection
         connection.close()
