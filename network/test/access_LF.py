@@ -20,10 +20,10 @@ class Stats:
     def __init__(self, nodes):
         self.nodes = nodes
         self.filename = '{}-mn-telemetry.txt'
-        self.stats_file = '{}-mn-stats.txt'
+        # self.stats_file = '{}-mn-stats.txt'
         self.thread_ = None
-        self.dir = 'cat /sys/class/ieee80211/{}/device/net/{}/statistics/{}'
-        self.data_type = 'tx_bytes'
+        # self.dir = 'cat /sys/class/ieee80211/{}/device/net/{}/statistics/{}'
+        # self.data_type = 'tx_bytes'
 
     @classmethod
     def get_ifaces(cls, nodes, inNamespaceNodes, phys):
@@ -100,22 +100,52 @@ class Stats:
                     names.append(self.ifaces[node][wlan])
                     nodes_x[node], nodes_y[node] = [], []
                     rssi = mn_wifi.telemetry.get_rssi(node, self.ifaces[node][wlan])
-                    arr = self.nodes.index(node)
-                    if isinstance(node, AP):
-                        tx_bytes = subprocess.check_output(
-                            ("%s" % self.dir).format(self.phys[arr],
-                                                     self.ifaces[node][wlan],
-                                                     self.data_type),
-                            shell=True).decode().split("\n")
-                    else:
-                        tx_bytes = subprocess.check_output(
-                            '%s %s ' % (util_dir, node) +
-                            ('%s' % self.dir).format(self.phys[arr],
-                                                     self.ifaces[node][wlan],
-                                                     self.data_type),
-                            shell=True).decode().split("\n")
-                    mn_wifi.telemetry.get_values_from_statistics(tx_bytes, time_, node, self.stats_file)
                     os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, rssi, self.filename.format(node)))
+
+
+class Ping:
+    def __init__(self, nodes, net):
+        self.nodes = nodes
+        self.thread_ = None
+        self.filename = '{}-mn-ping_position.txt'
+
+    def get_ping(self, node):
+        cmd = 'ping 10.0.0.1 -c 1'
+        isAP = False
+        #ping_status = subprocess.check_output(cmd, shell=True).decode()
+        if isinstance(node, AP) and not isAP:
+            ping_status = subprocess.check_output(cmd,
+                                                  shell=True).decode().split("\n")
+            isAP = True
+        else:
+            if not isinstance(node, AP):
+                ping_status = subprocess.check_output('%s %s %s' % (util_dir, node, cmd),
+                                                      shell=True).decode().split("\n")
+        return ping_status
+
+    def start(self):
+        time_ = time.time() - start
+        inNamespaceNodes = []
+        names = []
+
+        for node in self.nodes:
+            if not isinstance(node, AP):
+                inNamespaceNodes.append(node)
+            if os.path.exists('%s' % (self.filename.format(node))):
+                os.system('rm %s' % (self.filename.format(node)))
+            if node.name not in names:
+                names.append(node.name)
+
+        while self.thread_._keep_alive:
+            for node in self.nodes:
+                x, y, z = mn_wifi.telemetry.get_position(node)
+                try:
+                    status= self.get_ping(node)
+                except:
+                    status = 'No ping'
+
+                os.system("echo '%s, %s, %s, %s' >> %s" % (time_, x, y, status, self.filename.format(node)))
+
 
 
 def topology(args):
@@ -142,13 +172,14 @@ def topology(args):
     info("*** Creating links\n")
 
     nodes = net.stations + net.aps
-    #net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
+    # net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
 
     stat = Stats(nodes)
     stat.thread_ = thread(target=stat.start)
     stat.thread_.daemon = True
     stat.thread_._keep_alive = True
     stat.thread_.start()
+
 
     info('*** Starting network\n')
     net.build()

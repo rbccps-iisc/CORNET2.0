@@ -53,7 +53,7 @@ def get_pose(msg):
         sock.close()
         #sock.sendall(":SEND\n".encode('utf-8'))
         #print(mininet_client(''.join([str(item) for item in ns_msg])))
-        rospy.sleep(1)
+        #rospy.sleep(1)
     except socket.error as msg:
         print(msg)
         #sys.exit(1)
