@@ -134,20 +134,20 @@ def topology(args):
     #                      position='5,-5,0', **kwargs)
 
     ap1 = net.addAccessPoint('ap1', ssid='new-ssid', position='10,0,0')
-    net.setPropagationModel(model="logDistance", exp=4)
+    net.setPropagationModel(model="logDistance", exp=4.5)
     info("*** Configuring wifi nodes\n")
     net.configureWifiNodes()
 
     info("*** Creating links\n")
 
-    nodes = net.stations #+ net.aps
-    # net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
+    nodes = net.stations + net.aps
+    net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
 
-    stat = Stats(nodes)
-    stat.thread_ = thread(target=stat.start)
-    stat.thread_.daemon = True
-    stat.thread_._keep_alive = True
-    stat.thread_.start()
+    # stat = Stats(nodes)
+    # stat.thread_ = thread(target=stat.start)
+    # stat.thread_.daemon = True
+    # stat.thread_._keep_alive = True
+    # stat.thread_.start()
 
 
     info('*** Starting network\n')

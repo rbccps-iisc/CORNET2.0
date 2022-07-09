@@ -66,7 +66,7 @@ def topology(args):
     info("*** Creating nodes\n")
     number_of_stations = 2
     staList = []
-    number_of_congestion = 5
+    number_of_congestion = 3
 
     net.addStation('sta1', mac='00:00:00:00:00:02', ip='10.0.0.30/8',
                     position='0,0,0')

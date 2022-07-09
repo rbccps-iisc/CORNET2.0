@@ -142,13 +142,13 @@ def topology(args):
     # if '-p' not in args:
     #     net.plotGraph(max_x=100, max_y=100)
     nodes = net.stations + net.aps
-    #net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
+    net.telemetry(nodes=nodes, single=True, min_x=-100, min_y=-100, max_x=100, max_y=100, data_type='position')
 
-    stat = Stats(nodes)
-    stat.thread_ = thread(target=stat.start)
-    stat.thread_.daemon = True
-    stat.thread_._keep_alive = True
-    stat.thread_.start()
+    # stat = Stats(nodes)
+    # stat.thread_ = thread(target=stat.start)
+    # stat.thread_.daemon = True
+    # stat.thread_._keep_alive = True
+    # stat.thread_.start()
 
     info("*** Creating links\n")
     # MANET routing protocols supported by proto:
