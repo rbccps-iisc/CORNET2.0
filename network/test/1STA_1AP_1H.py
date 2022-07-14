@@ -125,6 +125,8 @@ def topology(args):
     info("*** Running CLI\n")
     CLI(net)
 
+    os.system('sudo service network-manager start')
+
     info("*** Stopping network\n")
     net.stop()
 

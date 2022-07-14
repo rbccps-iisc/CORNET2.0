@@ -1,3 +1,4 @@
+
 from containernet.net import Containernet
 from containernet.node import DockerSta,Docker
 from containernet.cli import CLI
@@ -34,12 +35,12 @@ class Topology_MN(Topo):
             # print self.type[idx], self.pose[idx]['position']['x'], node
             position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
                 pose[idx]['position']['z'])
-            print position
-            print idx, node
+            print (position)
+            print (idx, node)
             if node_type[idx] == "STATIC":
                 robots.append(self.addHost(node,cls=Docker, dimage="cornet:focalfoxyNWH", ip=ip_list[idx]))  # , position=position)
 
-                aps.append(self.addAccessPoint('ap1', ip='10.0.0.10', ssid='new-ssid', mode='g', position=position))
+                aps.append(self.addAccessPoint('ap1', ip='10.0.0.10', ssid='new-ssid', mode='g', position=position, failMode="standalone"))
                 info("*** Creating links\n")
                 self.addLink(robots[idx], aps[idx], cls=TCLink)
             elif node_type[idx] == "MOBILE":
@@ -49,7 +50,7 @@ class Topology_MN(Topo):
 
         # gazebo=self.addHost('gazebo', ip='10.0.0.252/8')
         # self.addLink(gazebo,aps.pop())
-        print robots, aps
+        print (robots, aps)
 
 def main(args):
     if len(args) != 2:
@@ -59,7 +60,7 @@ def main(args):
                            wmediumd_mode=interference)
         net.setPropagationModel(model="logDistance", exp=4)
         info("*** Configuring wifi nodes\n")
-        # net.configureWifiNodes()
+        #net.configureWifiNodes()
         if '-p' not in args:
             net.plotGraph(max_x=100, max_y=100)
         #nodes = net.stations  # + net.aps
@@ -78,11 +79,12 @@ def main(args):
         info("*** Running CLI\n")
         CLI(net)
 
+        os.system('sudo service network-manager start')
         info("*** Stopping network\n")
         net.stop()
 
 
 if __name__ == '__main__':
     os.system('sudo service network-manager stop')
-    setLogLevel('info')
+    setLogLevel('debug')
     sys.exit(main(sys.argv))
