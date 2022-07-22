@@ -38,8 +38,8 @@ class Topology_MN(Topo):
             # print self.type[idx], self.pose[idx]['position']['x'], node
             position = str(pose[idx]['position']['x']) + "," + str(pose[idx]['position']['y']) + "," + str(
                 pose[idx]['position']['z'])
-            print position
-            print idx, node
+            print (position)
+            print (idx, node)
             if node_type[idx] == "STATIC":
                 robots.append(self.addHost(node, ip=ip_list[idx]))  # , position=position)
 
@@ -53,7 +53,7 @@ class Topology_MN(Topo):
 
         # gazebo=self.addHost('gazebo', ip='10.0.0.252/8')
         # self.addLink(gazebo,aps.pop())
-        print robots, aps
+        print (robots, aps)
 
 
 def main(args):

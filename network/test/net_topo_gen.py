@@ -28,7 +28,7 @@ class Topology_MN(Topo):
         ip_list = config['ip_list']
 
         # hosts = []
-        aps = []
+        #aps = []
         robots = []
 
         for idx, node in enumerate(models):
@@ -40,17 +40,19 @@ class Topology_MN(Topo):
             if node_type[idx] == "STATIC":
                 robots.append(self.addHost(node,cls=Docker, dimage="cornet:focalfoxyNWH", ip=ip_list[idx]))  # , position=position)
 
-                aps.append(self.addAccessPoint('ap1', ip='10.0.0.10', ssid='new-ssid', mode='g', position=position, failMode="standalone"))
+                aps = (self.addAccessPoint('ap1', ip='10.0.0.10', ssid='new-ssid', mode='g', position=position, failMode="standalone"))
                 info("*** Creating links\n")
-                self.addLink(robots[idx], aps[idx], cls=TCLink)
+                self.addLink(robots[idx], aps, cls=TCLink)
             elif node_type[idx] == "MOBILE":
                 robots.append(self.addStation(node, ip=ip_list[idx], cls=DockerSta, dimage="cornet:focalfoxyNWH",
                                               cpu_shares=20, position=position))
-                aps.append(0)
-
+                #aps.append(0)
         # gazebo=self.addHost('gazebo', ip='10.0.0.252/8')
         # self.addLink(gazebo,aps.pop())
-        print (robots, aps)
+        #self.addLink(aps.pop(), robots.pop())
+        # for idx, robot in enumerate(robots):
+        #     self.addLink(robot, aps, cls=TCLink)
+        #print (robots, aps)
 
 def main(args):
     if len(args) != 2:
@@ -69,10 +71,11 @@ def main(args):
         info("*** Starting Network\n")
         # net.addNAT(linkTo='ap1').configDefault()
         net.start()
-        aps = net.stations
+        aps = net.get('ap1')
         info("*** printing all nodes\n")
         print (aps)
         info("*** Staring Socket Server\n")
+        aps.start([])
 
         net.socketServer(ip='127.0.0.1', port=12345)
 
